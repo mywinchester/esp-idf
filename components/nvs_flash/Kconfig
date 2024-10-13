@@ -1,38 +1,35 @@
-menu "NVS"
+menu "非易失性存储 (NVS)"
 
     config NVS_ENCRYPTION
-        bool "Enable NVS encryption"
+        bool "启用 NVS 加密"
         depends on SECURE_FLASH_ENC_ENABLED || SOC_HMAC_SUPPORTED
         default y if SECURE_FLASH_ENC_ENABLED
         help
-            This option enables encryption for NVS. When enabled, XTS-AES is used to encrypt
-            the complete NVS data, except the page headers. It requires XTS encryption keys
-            to be stored in an encrypted partition (enabling flash encryption is mandatory here)
-            or to be derived from an HMAC key burnt in eFuse.
+            此选项为 NVS 启用加密。启用后，XTS-AES 将用于加密完整的 NVS 数据，
+            除了页面头部。它需要将 XTS 加密密钥存储在加密分区中（此处必须启用
+            闪存加密）或从烧录在 eFuse 中的 HMAC 密钥派生。
 
     config NVS_COMPATIBLE_PRE_V4_3_ENCRYPTION_FLAG
-        bool "NVS partition encrypted flag compatible with ESP-IDF before v4.3"
+        bool "NVS 分区加密标志与 ESP-IDF v4.3 之前版本兼容"
         depends on SECURE_FLASH_ENC_ENABLED
         help
-            Enabling this will ignore "encrypted" flag for NVS partitions. NVS encryption
-            scheme is different than hardware flash encryption and hence it is not recommended
-            to have "encrypted" flag for NVS partitions. This was not being checked in pre v4.3
-            IDF. Hence, if you have any devices where this flag is kept enabled in partition
-            table then enabling this config will allow to have same behavior as pre v4.3 IDF.
+            启用此选项将忽略 NVS 分区的"加密"标志。NVS 加密方案与硬件闪存加密
+            不同，因此不建议为 NVS 分区设置"加密"标志。在 v4.3 之前的 IDF 版本
+            中没有检查这一点。因此，如果您有任何设备在分区表中保持此标志启用，
+            那么启用此配置将允许具有与 v4.3 之前的 IDF 相同的行为。
 
     config NVS_ASSERT_ERROR_CHECK
-        bool "Use assertions for error checking"
+        bool "使用断言进行错误检查"
         default n
         help
-            This option switches error checking type between assertions (y) or return codes (n).
+            此选项在断言（y）或返回代码（n）之间切换错误检查类型。
 
     config NVS_LEGACY_DUP_KEYS_COMPATIBILITY
-        bool "Enable legacy nvs_set function behavior when same key is reused with different data types"
+        bool "启用旧版 nvs_set 函数行为，当相同键被重用于不同数据类型时"
         default n
         help
-            Enabling this option will switch the nvs_set() family of functions to the legacy mode:
-            when called repeatedly with the same key but different data type, the existing value
-            in the NVS remains active and the new value is just stored, actually not accessible through
-            corresponding nvs_get() call for the key given. Use this option only when your application
-            relies on such NVS API behaviour.
+            启用此选项将使 nvs_set() 系列函数切换到旧模式：当使用相同的键但
+            不同的数据类型重复调用时，NVS 中的现有值保持活动状态，新值仅被
+            存储，实际上无法通过对给定键的相应 nvs_get() 调用访问。仅当您的
+            应用程序依赖于此类 NVS API 行为时才使用此选项。
 endmenu

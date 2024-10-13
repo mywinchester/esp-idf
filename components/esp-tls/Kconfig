@@ -1,118 +1,111 @@
 menu "ESP-TLS"
     choice ESP_TLS_LIBRARY_CHOOSE
-        prompt "Choose SSL/TLS library for ESP-TLS (See help for more Info)"
+        prompt "为 ESP-TLS 选择 SSL/TLS 库（查看帮助获取更多信息）"
         default ESP_TLS_USING_MBEDTLS
         help
-            The ESP-TLS APIs support multiple backend TLS libraries. Currently mbedTLS and WolfSSL are
-            supported. Different TLS libraries may support different features and have different resource
-            usage. Consult the ESP-TLS documentation in ESP-IDF Programming guide for more details.
+            ESP-TLS API 支持多个后端 TLS 库。目前支持 mbedTLS 和 WolfSSL。
+            不同的 TLS 库可能支持不同的功能并具有不同的资源使用情况。
+            请查阅 ESP-IDF 编程指南中的 ESP-TLS 文档以获取更多详细信息。
         config ESP_TLS_USING_MBEDTLS
             bool "mbedTLS"
         config ESP_TLS_USING_WOLFSSL
             depends on TLS_STACK_WOLFSSL
-            bool "wolfSSL (License info in wolfSSL directory README)"
+            bool "wolfSSL（许可信息请参阅 wolfSSL 目录中的 README）"
     endchoice
 
     config ESP_TLS_USE_SECURE_ELEMENT
-        bool "Use Secure Element (ATECC608A) with ESP-TLS"
+        bool "在 ESP-TLS 中使用安全元件（ATECC608A）"
         depends on IDF_TARGET_ESP32 && ESP_TLS_USING_MBEDTLS
         select ATCA_MBEDTLS_ECDSA
         select ATCA_MBEDTLS_ECDSA_SIGN
         select ATCA_MBEDTLS_ECDSA_VERIFY
         help
-            Enable use of Secure Element for ESP-TLS, this enables internal support for
-            ATECC608A peripheral, which can be used for TLS connection.
+            为 ESP-TLS 启用安全元件的使用，这将启用对 ATECC608A 外设的内部支持，
+            该外设可用于 TLS 连接。
 
     config ESP_TLS_USE_DS_PERIPHERAL
-        bool "Use Digital Signature (DS) Peripheral with ESP-TLS"
+        bool "在 ESP-TLS 中使用数字签名（DS）外设"
         depends on ESP_TLS_USING_MBEDTLS && SOC_DIG_SIGN_SUPPORTED
         default y
         help
-            Enable use of the Digital Signature Peripheral for ESP-TLS.The DS peripheral
-            can only be used when it is appropriately configured for TLS.
-            Consult the ESP-TLS documentation in ESP-IDF Programming Guide for more details.
+            为 ESP-TLS 启用数字签名外设的使用。DS 外设只能在为 TLS 适当配置时使用。
+            请查阅 ESP-IDF 编程指南中的 ESP-TLS 文档以获取更多详细信息。
 
     config ESP_TLS_CLIENT_SESSION_TICKETS
-        bool "Enable client session tickets"
+        bool "启用客户端会话票证"
         depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_CLIENT_SSL_SESSION_TICKETS
         help
-            Enable session ticket support as specified in RFC5077.
+            启用 RFC5077 中指定的会话票证支持。
 
     config ESP_TLS_SERVER_SESSION_TICKETS
-        bool "Enable server session tickets"
+        bool "启用服务器会话票证"
         depends on ESP_TLS_USING_MBEDTLS && MBEDTLS_SERVER_SSL_SESSION_TICKETS
         help
-            Enable session ticket support as specified in RFC5077
+            启用 RFC5077 中指定的会话票证支持
 
     config ESP_TLS_SERVER_SESSION_TICKET_TIMEOUT
-        int "Server session ticket timeout in seconds"
+        int "服务器会话票证超时时间（秒）"
         depends on ESP_TLS_SERVER_SESSION_TICKETS
         default 86400
         help
-            Sets the session ticket timeout used in the tls server.
+            设置 TLS 服务器中使用的会话票证超时时间。
 
     config ESP_TLS_SERVER_CERT_SELECT_HOOK
-        bool "Certificate selection hook"
+        bool "证书选择钩子"
         depends on ESP_TLS_USING_MBEDTLS
         help
-            Ability to configure and use a certificate selection callback during server handshake,
-            to select a certificate to present to the client based on the TLS extensions supplied in
-            the client hello (alpn, sni, etc).
+            能够在服务器握手期间配置和使用证书选择回调，
+            根据客户端 hello 中提供的 TLS 扩展（alpn、sni 等）选择要呈现给客户端的证书。
 
     config ESP_TLS_SERVER_MIN_AUTH_MODE_OPTIONAL
-        bool "ESP-TLS Server: Set minimum Certificate Verification mode to Optional"
+        bool "ESP-TLS 服务器：将最小证书验证模式设置为可选"
         depends on ESP_TLS_USING_MBEDTLS
         help
-            When this option is enabled, the peer (here, the client) certificate is checked by the server,
-            however the handshake continues even if verification failed. By default, the
-            peer certificate is not checked and ignored by the server.
+            启用此选项后，服务器会检查对等方（此处为客户端）证书，
+            但即使验证失败，握手也会继续。默认情况下，
+            服务器不检查对等方证书并忽略它。
 
-            mbedtls_ssl_get_verify_result() can be called after the handshake is complete to
-            retrieve status of verification.
+            握手完成后可以调用 mbedtls_ssl_get_verify_result() 来检索验证状态。
 
     config ESP_TLS_PSK_VERIFICATION
-        bool "Enable PSK verification"
+        bool "启用 PSK 验证"
         select MBEDTLS_PSK_MODES if ESP_TLS_USING_MBEDTLS
         select MBEDTLS_KEY_EXCHANGE_PSK if ESP_TLS_USING_MBEDTLS
         select MBEDTLS_KEY_EXCHANGE_DHE_PSK if ESP_TLS_USING_MBEDTLS && MBEDTLS_DHM_C
         select MBEDTLS_KEY_EXCHANGE_ECDHE_PSK if ESP_TLS_USING_MBEDTLS && MBEDTLS_ECDH_C
         select MBEDTLS_KEY_EXCHANGE_RSA_PSK if ESP_TLS_USING_MBEDTLS
         help
-            Enable support for pre shared key ciphers, supported for both mbedTLS as well as
-            wolfSSL TLS library.
+            启用对预共享密钥密码的支持，支持 mbedTLS 和 wolfSSL TLS 库。
 
     config ESP_TLS_INSECURE
-        bool "Allow potentially insecure options"
+        bool "允许潜在不安全的选项"
         help
-            You can enable some potentially insecure options. These options should only be used for testing pusposes.
-            Only enable these options if you are very sure.
+            您可以启用一些潜在的不安全选项。这些选项应该只用于测试目的。
+            只有在您非常确定的情况下才启用这些选项。
 
     config ESP_TLS_SKIP_SERVER_CERT_VERIFY
-        bool "Skip server certificate verification by default (WARNING: ONLY FOR TESTING PURPOSE, READ HELP)"
+        bool "默认跳过服务器证书验证（警告：仅用于测试目的，请阅读帮助）"
         depends on ESP_TLS_INSECURE
         help
-            After enabling this option the esp-tls client will skip the server certificate verification
-            by default. Note that this option will only modify the default behaviour of esp-tls client
-            regarding server cert verification. The default behaviour should only be applicable when
-            no other option regarding the server cert verification is opted in the esp-tls config
-            (e.g. crt_bundle_attach, use_global_ca_store etc.).
-            WARNING : Enabling this option comes with a potential risk of establishing a TLS connection
-            with a server which has a fake identity, provided that the server certificate
-            is not provided either through API or other mechanism like ca_store etc.
+            启用此选项后，esp-tls 客户端默认将跳过服务器证书验证。
+            请注意，此选项仅修改 esp-tls 客户端关于服务器证书验证的默认行为。
+            默认行为应仅在 esp-tls 配置中未选择其他服务器证书验证选项时适用
+            （例如 crt_bundle_attach、use_global_ca_store 等）。
+            警告：启用此选项存在潜在风险，可能会与具有虚假身份的服务器建立 TLS 连接，
+            前提是未通过 API 或其他机制（如 ca_store 等）提供服务器证书。
 
     config ESP_WOLFSSL_SMALL_CERT_VERIFY
-        bool "Enable SMALL_CERT_VERIFY"
+        bool "启用 SMALL_CERT_VERIFY"
         depends on ESP_TLS_USING_WOLFSSL
         default y
         help
-            Enables server verification with Intermediate CA cert, does not authenticate full chain
-            of trust upto the root CA cert (After Enabling this option client only needs to have Intermediate
-            CA certificate of the server to authenticate server, root CA cert is not necessary).
+            启用使用中间 CA 证书进行服务器验证，不验证直到根 CA 证书的完整信任链
+            （启用此选项后，客户端只需要服务器的中间 CA 证书来验证服务器，不需要根 CA 证书）。
 
     config ESP_DEBUG_WOLFSSL
-        bool "Enable debug logs for wolfSSL"
+        bool "为 wolfSSL 启用调试日志"
         depends on ESP_TLS_USING_WOLFSSL
         help
-            Enable detailed debug prints for wolfSSL SSL library.
+            为 wolfSSL SSL 库启用详细的调试打印。
 
 endmenu

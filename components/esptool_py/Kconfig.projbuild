@@ -1,48 +1,45 @@
-menu "Serial flasher config"
+menu "串口烧录器配置"
     depends on !APP_BUILD_TYPE_PURE_RAM_APP
 
     config ESPTOOLPY_NO_STUB
-        bool "Disable download stub"
+        bool "禁用下载存根"
         default "y" if IDF_ENV_FPGA || IDF_ENV_BRINGUP
         default "n"
 
         help
-            The flasher tool sends a precompiled download stub first by default. That stub allows things
-            like compressed downloads and more. Usually you should not need to disable that feature
+            烧录工具默认首先发送一个预编译的下载存根。该存根允许进行压缩下载等功能。
+            通常您不需要禁用此功能。
 
     config ESPTOOLPY_OCT_FLASH
         depends on IDF_TARGET_ESP32S3
-        bool "Enable Octal Flash"
+        bool "启用八线闪存"
         default n
 
     config ESPTOOLPY_FLASH_MODE_AUTO_DETECT
         depends on IDF_TARGET_ESP32S3
-        bool "Choose flash mode automatically (please read help)"
+        bool "自动选择闪存模式（请阅读帮助）"
         default y
         help
-            This config option helps decide whether flash is Quad or Octal, but please note some limitations:
+            此配置选项有助于决定闪存是四线还是八线，但请注意一些限制：
 
-            1. If the flash chip is an Octal one, even if one of "QIO", "QOUT", "DIO", "DOUT" options is
-               selected in `ESPTOOLPY_FLASHMODE`, our code will automatically change the
-               mode to "OPI" and the sample mode will be STR.
-            2. If the flash chip is a Quad one, even if "OPI" is selected in `ESPTOOLPY_FLASHMODE`, our code will
-               automatically change the mode to "DIO".
-            3. This option is mainly to improve the out-of-box experience of developers. It doesn't guarantee
-               the feature-complete. Some code still rely on `ESPTOOLPY_OCT_FLASH`. Please do not rely on this option
-               when you are pretty sure that you are using Octal flash.
-               In this case, please enable `ESPTOOLPY_OCT_FLASH` option, then you can choose `DTR` sample mode
-               in `ESPTOOLPY_FLASH_SAMPLE_MODE`. Otherwise, only `STR` mode is available.
-            4. Enabling this feature reduces available internal RAM size (around 900 bytes).
-               If your IRAM space is insufficient and you're aware of your flash type,
-               disable this option and select corresponding flash type options.
+            1. 如果闪存芯片是八线的，即使在 `ESPTOOLPY_FLASHMODE` 中选择了 "QIO"、"QOUT"、"DIO"、"DOUT" 
+               选项之一，我们的代码也会自动将模式更改为 "OPI"，采样模式将为 STR。
+            2. 如果闪存芯片是四线的，即使在 `ESPTOOLPY_FLASHMODE` 中选择了 "OPI"，我们的代码也会
+               自动将模式更改为 "DIO"。
+            3. 此选项主要是为了改善开发人员的开箱即用体验。它不保证功能完整。一些代码仍然依赖于
+               `ESPTOOLPY_OCT_FLASH`。当您确定使用的是八线闪存时，请不要依赖此选项。
+               在这种情况下，请启用 `ESPTOOLPY_OCT_FLASH` 选项，然后您可以在 `ESPTOOLPY_FLASH_SAMPLE_MODE`
+               中选择 `DTR` 采样模式。否则，只有 `STR` 模式可用。
+            4. 启用此功能会减少可用的内部 RAM 大小（约 900 字节）。
+               如果您的 IRAM 空间不足，并且您了解您的闪存类型，
+               请禁用此选项并选择相应的闪存类型选项。
 
     choice ESPTOOLPY_FLASHMODE
-        prompt "Flash SPI mode"
+        prompt "闪存 SPI 模式"
         default ESPTOOLPY_FLASHMODE_DIO
         default ESPTOOLPY_FLASHMODE_OPI if ESPTOOLPY_OCT_FLASH
         help
-            Mode the flash chip is flashed in, as well as the default mode for the
-            binary to run in.
+            闪存芯片被烧录的模式，以及二进制文件运行的默认模式。
 
         config ESPTOOLPY_FLASHMODE_QIO
             depends on !ESPTOOLPY_OCT_FLASH
@@ -62,15 +59,15 @@ menu "Serial flasher config"
     endchoice
 
     choice ESPTOOLPY_FLASH_SAMPLE_MODE
-        prompt "Flash Sampling Mode"
+        prompt "闪存采样模式"
         default ESPTOOLPY_FLASH_SAMPLE_MODE_DTR if ESPTOOLPY_OCT_FLASH
         default ESPTOOLPY_FLASH_SAMPLE_MODE_STR if !ESPTOOLPY_OCT_FLASH
 
         config ESPTOOLPY_FLASH_SAMPLE_MODE_STR
-            bool "STR Mode"
+            bool "STR 模式"
         config ESPTOOLPY_FLASH_SAMPLE_MODE_DTR
             depends on ESPTOOLPY_OCT_FLASH
-            bool "DTR Mode"
+            bool "DTR 模式"
     endchoice
 
     # Note: we use esptool.py to flash bootloader in
@@ -89,27 +86,25 @@ menu "Serial flasher config"
         default "dout" if ESPTOOLPY_FLASHMODE_OPI
 
     choice ESPTOOLPY_FLASHFREQ
-        prompt "Flash SPI speed"
+        prompt "闪存 SPI 速度"
         # TODO: [ESP32C5] IDF-8649 switch back to 80M
         # TODO: [ESP32C61] IDF-9256
         default ESPTOOLPY_FLASHFREQ_40M if IDF_TARGET_ESP32 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C61
         default ESPTOOLPY_FLASHFREQ_80M if ESPTOOLPY_FLASHFREQ_80M_DEFAULT
         default ESPTOOLPY_FLASHFREQ_60M if IDF_TARGET_ESP32C2
         config ESPTOOLPY_FLASHFREQ_120M
-            bool "120 MHz (READ DOCS FIRST)"
+            bool "120 MHz（请先阅读文档）"
             depends on SOC_MEMSPI_SRC_FREQ_120M && \
                 (SPI_FLASH_HPM_ON || ESPTOOLPY_OCT_FLASH) && \
                 (ESPTOOLPY_FLASH_SAMPLE_MODE_STR || IDF_EXPERIMENTAL_FEATURES)
             help
-                - Optional feature for QSPI Flash. Read docs and enable `CONFIG_SPI_FLASH_HPM_ENA` first!
-                - Flash 120 MHz SDR mode is stable.
-                - Flash 120 MHz DDR mode is an experimental feature, it works when
-                  the temperature is stable.
+                - QSPI 闪存的可选功能。请先阅读文档并启用 `CONFIG_SPI_FLASH_HPM_ENA`！
+                - 闪存 120 MHz SDR 模式是稳定的。
+                - 闪存 120 MHz DDR 模式是一个实验性功能，它在温度稳定时工作。
 
-                    Risks:
-                        If your chip powers on at a certain temperature, then after the temperature
-                        increases or decreases by approximately 20 Celsius degrees (depending on the
-                        chip), the program will crash randomly.
+                    风险：
+                        如果您的芯片在某个温度下开机，然后温度升高或降低约 20 摄氏度（取决于芯片），
+                        程序将随机崩溃。
 
         config ESPTOOLPY_FLASHFREQ_80M
             bool "80 MHz"
@@ -153,7 +148,7 @@ menu "Serial flasher config"
         bool
         default y if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C6
         help
-            This is an invisible item, used to define the targets that defaults to use 80MHz Flash SPI speed.
+            这是一个不可见的项目，用于定义默认使用 80MHz 闪存 SPI 速度的目标。
 
     config ESPTOOLPY_FLASHFREQ
         string
@@ -175,10 +170,10 @@ menu "Serial flasher config"
 
 
     choice ESPTOOLPY_FLASHSIZE
-        prompt "Flash size"
+        prompt "闪存大小"
         default ESPTOOLPY_FLASHSIZE_2MB
         help
-            SPI flash size, in megabytes
+            SPI 闪存大小，以兆字节为单位
 
         config ESPTOOLPY_FLASHSIZE_1MB
             bool "1 MB"
@@ -210,31 +205,28 @@ menu "Serial flasher config"
         default "128MB" if ESPTOOLPY_FLASHSIZE_128MB
 
     config ESPTOOLPY_HEADER_FLASHSIZE_UPDATE
-        bool "Detect flash size when flashing bootloader"
+        bool "烧录引导加载程序时检测闪存大小"
         default n
         help
-            If this option is set, flashing the project will automatically detect
-            the flash size of the target chip and update the bootloader image
-            before it is flashed.
+            如果设置此选项，在烧录项目时将自动检测目标芯片的闪存大小，
+            并在烧录前更新引导加载程序镜像。
 
-            Enabling this option turns off the image protection against corruption
-            by a SHA256 digest. Updating the bootloader image before flashing would
-            invalidate the digest.
+            启用此选项会关闭通过 SHA256 摘要保护镜像免受损坏的功能。
+            在烧录前更新引导加载程序镜像会使摘要无效。
 
     choice ESPTOOLPY_BEFORE
-        prompt "Before flashing"
+        prompt "烧录前"
         default ESPTOOLPY_BEFORE_RESET
         help
-            Configure whether esptool.py should reset the ESP32 before flashing.
+            配置 esptool.py 是否应在烧录前重置 ESP32。
 
-            Automatic resetting depends on the RTS & DTR signals being
-            wired from the serial port to the ESP32. Most USB development
-            boards do this internally.
+            自动重置取决于 RTS 和 DTR 信号是否从串口连接到 ESP32。
+            大多数 USB 开发板内部都有这种连接。
 
         config ESPTOOLPY_BEFORE_RESET
-            bool "Reset to bootloader"
+            bool "重置到引导加载程序"
         config ESPTOOLPY_BEFORE_NORESET
-            bool "No reset"
+            bool "不重置"
     endchoice
 
     config ESPTOOLPY_BEFORE
@@ -243,19 +235,18 @@ menu "Serial flasher config"
         default "no_reset" if ESPTOOLPY_BEFORE_NORESET
 
     choice ESPTOOLPY_AFTER
-        prompt "After flashing"
+        prompt "烧录后"
         default ESPTOOLPY_AFTER_RESET
         help
-            Configure whether esptool.py should reset the ESP32 after flashing.
+            配置 esptool.py 是否应在烧录后重置 ESP32。
 
-            Automatic resetting depends on the RTS & DTR signals being
-            wired from the serial port to the ESP32. Most USB development
-            boards do this internally.
+            自动重置取决于 RTS 和 DTR 信号是否从串口连接到 ESP32。
+            大多数 USB 开发板内部都有这种连接。
 
         config ESPTOOLPY_AFTER_RESET
-            bool "Reset after flashing"
+            bool "烧录后重置"
         config ESPTOOLPY_AFTER_NORESET
-            bool "Stay in bootloader"
+            bool "保持在引导加载程序中"
     endchoice
 
     config ESPTOOLPY_AFTER

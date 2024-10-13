@@ -14,18 +14,14 @@ mainmenu "Espressif IoT Development Framework Configuration"
         bool
         option env="IDF_ENV_FPGA"
         help
-            - This option is for internal use only.
-            - Enabling this option will help enable all FPGA support so as to
-              run ESP-IDF on an FPGA. This can help reproduce some issues that
-              only happens on FPGA condition, or when you have to burn some
-              efuses multiple times.
+            - 此选项仅供内部使用。
+            - 启用此选项将帮助启用所有FPGA支持，以便在FPGA上运行ESP-IDF。这可以帮助重现一些只在FPGA条件下发生的问题，或者当您必须多次烧写一些efuses时。
 
     config IDF_ENV_BRINGUP
         bool
         help
-            - This option is ONLY used when doing new chip bringup.
-            - This option will only enable necessary hw / sw settings for running
-              a hello_world application.
+            - 此选项仅在进行新芯片引导时使用。
+            - 此选项将仅启用运行hello_world应用程序所需的必要硬件/软件设置。
 
 
     config IDF_CI_BUILD
@@ -117,13 +113,13 @@ mainmenu "Espressif IoT Development Framework Configuration"
 
     # TODO: IDF-9197
     choice IDF_TARGET_ESP32C5_VERSION
-        prompt "ESP32-C5 version"
+        prompt "ESP32-C5版本"
         depends on IDF_TARGET_ESP32C5
         default IDF_TARGET_ESP32C5_MP_VERSION
         help
-            ESP32-C5 will support two versions for a period.
-            This option is for internal use only.
-            Select the one that matches your chip model.
+            ESP32-C5将在一段时间内支持两个版本。
+            此选项仅供内部使用。
+            选择与您的芯片型号匹配的版本。
 
         config IDF_TARGET_ESP32C5_BETA3_VERSION
             bool
@@ -175,61 +171,47 @@ mainmenu "Espressif IoT Development Framework Configuration"
         default 0xFFFF
 
 
-    menu "Build type"
+    menu "构建类型"
 
         choice APP_BUILD_TYPE
-            prompt "Application build type"
+            prompt "应用程序构建类型"
             default APP_BUILD_TYPE_APP_2NDBOOT
             help
-                Select the way the application is built.
+                选择应用程序的构建方式。
 
-                By default, the application is built as a binary file in a format compatible with
-                the ESP-IDF bootloader. In addition to this application, 2nd stage bootloader is
-                also built. Application and bootloader binaries can be written into flash and
-                loaded/executed from there.
+                默认情况下，应用程序被构建为与ESP-IDF引导加载程序兼容的二进制文件格式。除了这个应用程序之外，还会构建第二阶段引导加载程序。应用程序和引导加载程序二进制文件可以写入闪存并从那里加载/执行。
 
-                Another option, useful for only very small and limited applications, is to only link
-                the .elf file of the application, such that it can be loaded directly into RAM over
-                JTAG or UART. Note that since IRAM and DRAM sizes are very limited, it is not possible
-                to build any complex application this way. However for some kinds of testing and debugging,
-                this option may provide faster iterations, since the application does not need to be
-                written into flash.
+                另一个选项，仅适用于非常小和有限的应用程序，是只链接应用程序的.elf文件，以便可以通过JTAG或UART直接加载到RAM中。请注意，由于IRAM和DRAM大小非常有限，无法以这种方式构建任何复杂的应用程序。然而，对于某些类型的测试和调试，这个选项可能提供更快的迭代，因为应用程序不需要写入闪存。
 
-                Note: when APP_BUILD_TYPE_RAM is selected and loaded with JTAG, ESP-IDF does not contain
-                all the startup code required to initialize the CPUs and ROM memory (data/bss).
-                Therefore it is necessary to execute a bit of ROM code prior to executing the application.
-                A gdbinit file may look as follows (for ESP32):
+                注意：当选择APP_BUILD_TYPE_RAM并通过JTAG加载时，ESP-IDF不包含初始化CPU和ROM内存（数据/bss）所需的所有启动代码。因此，在执行应用程序之前，有必要执行一些ROM代码。gdbinit文件可能如下所示（适用于ESP32）：
 
-                    # Connect to a running instance of OpenOCD
+                    # 连接到正在运行的OpenOCD实例
                     target remote :3333
-                    # Reset and halt the target
+                    # 重置并暂停目标
                     mon reset halt
-                    # Run to a specific point in ROM code,
-                    #  where most of initialization is complete.
+                    # 运行到ROM代码中的特定点，
+                    # 在那里大部分初始化已完成。
                     thb *0x40007d54
                     c
-                    # Load the application into RAM
+                    # 将应用程序加载到RAM中
                     load
-                    # Run till app_main
+                    # 运行到app_main
                     tb app_main
                     c
 
-                Execute this gdbinit file as follows:
+                按如下方式执行此gdbinit文件：
 
                     xtensa-esp32-elf-gdb build/app-name.elf -x gdbinit
 
-                Example gdbinit files for other targets can be found in tools/test_apps/system/gdb_loadable_elf/
+                其他目标的示例gdbinit文件可以在tools/test_apps/system/gdb_loadable_elf/中找到
 
-                When loading the BIN with UART, the ROM will jump to ram and run the app after finishing the ROM
-                startup code, so there's no additional startup initialization required. You can use the
-                `load_ram` in esptool.py to load the generated .bin file into ram and execute.
+                使用UART加载BIN时，ROM将在完成ROM启动代码后跳转到RAM并运行应用程序，因此不需要额外的启动初始化。您可以使用esptool.py中的`load_ram`将生成的.bin文件加载到RAM中并执行。
 
-                Example:
+                示例：
                     esptool.py --chip {chip} -p {port} -b {baud} --no-stub load_ram {app.bin}
 
-                Recommended sdkconfig.defaults for building loadable ELF files is as follows.
-                CONFIG_APP_BUILD_TYPE_RAM is required, other options help reduce application
-                memory footprint.
+                构建可加载ELF文件的推荐sdkconfig.defaults如下。
+                需要CONFIG_APP_BUILD_TYPE_RAM，其他选项有助于减少应用程序内存占用。
 
                     CONFIG_APP_BUILD_TYPE_RAM=y
                     CONFIG_VFS_SUPPORT_TERMIOS=
@@ -241,7 +223,7 @@ mainmenu "Espressif IoT Development Framework Configuration"
 
             config APP_BUILD_TYPE_APP_2NDBOOT
                 bool
-                prompt "Default (binary application + 2nd stage bootloader)"
+                prompt "默认（二进制应用程序 + 第二阶段引导加载程序）"
                 depends on !IDF_TARGET_LINUX
                 select APP_BUILD_GENERATE_BINARIES
                 select APP_BUILD_BOOTLOADER
@@ -249,7 +231,7 @@ mainmenu "Espressif IoT Development Framework Configuration"
 
             config APP_BUILD_TYPE_RAM
                 bool
-                prompt "Build app runs entirely in RAM (EXPERIMENTAL)"
+                prompt "构建的应用程序完全在RAM中运行（实验性）"
                 select APP_BUILD_GENERATE_BINARIES
 
         endchoice # APP_BUILD_TYPE
@@ -263,66 +245,58 @@ mainmenu "Espressif IoT Development Framework Configuration"
 
         config APP_BUILD_TYPE_PURE_RAM_APP
             bool
-            prompt "Build app without SPI_FLASH/PSRAM support (saves ram)"
+            prompt "构建应用程序时不包含SPI_FLASH/PSRAM支持（节省RAM）"
             depends on APP_BUILD_TYPE_RAM
             help
-                If this option is enabled, external memory and related peripherals, such as Cache, MMU,
-                Flash and PSRAM, won't be initialized. Corresponding drivers won't be introduced either.
-                Components that depend on the spi_flash component will also be unavailable, such as
-                app_update, etc. When this option is enabled, about 26KB of RAM space can be saved.
+                如果启用此选项，外部内存和相关外设（如Cache、MMU、Flash和PSRAM）将不会被初始化。相应的驱动程序也不会被引入。
+                依赖于spi_flash组件的组件也将不可用，例如app_update等。启用此选项时，可以节省约26KB的RAM空间。
 
         config APP_BUILD_USE_FLASH_SECTIONS
             bool # Whether to place code/data into memory-mapped flash sections
 
         config APP_REPRODUCIBLE_BUILD
-            bool "Enable reproducible build"
+            bool "启用可重现构建"
             default n
             select COMPILER_HIDE_PATHS_MACROS
             help
-                If enabled, all date, time, and path information would be eliminated. A .gdbinit file would be create
-                automatically. (or will be append if you have one already)
+                如果启用，所有日期、时间和路径信息都将被消除。将自动创建一个.gdbinit文件。
+                （或者如果您已经有一个，将会追加）
 
         config APP_NO_BLOBS
-            bool "No Binary Blobs"
+            bool "无二进制Blob"
             default n
             help
-                If enabled, this disables the linking of binary libraries in the application build. Note
-                that after enabling this Wi-Fi/Bluetooth will not work.
+                如果启用，这将禁用在应用程序构建中链接二进制库。请注意，
+                启用此选项后，Wi-Fi/蓝牙将无法工作。
 
         config APP_COMPATIBLE_PRE_V2_1_BOOTLOADERS
-            bool "App compatible with bootloaders before ESP-IDF v2.1"
+            bool "应用程序与ESP-IDF v2.1之前的引导加载程序兼容"
             select APP_COMPATIBLE_PRE_V3_1_BOOTLOADERS
             depends on IDF_TARGET_ESP32
             default n
             help
-                Bootloaders before ESP-IDF v2.1 did less initialisation of the
-                system clock. This setting needs to be enabled to build an app
-                which can be booted by these older bootloaders.
+                ESP-IDF v2.1之前的引导加载程序对系统时钟进行了较少的初始化。需要启用此设置
+                以构建可以由这些较旧的引导加载程序引导的应用程序。
 
-                If this setting is enabled, the app can be booted by any bootloader
-                from IDF v1.0 up to the current version.
+                如果启用此设置，应用程序可以由从IDF v1.0到当前版本的任何引导加载程序引导。
 
-                If this setting is disabled, the app can only be booted by bootloaders
-                from IDF v2.1 or newer.
+                如果禁用此设置，应用程序只能由IDF v2.1或更新版本的引导加载程序引导。
 
-                Enabling this setting adds approximately 1KB to the app's IRAM usage.
+                启用此设置会使应用程序的IRAM使用量增加约1KB。
 
         config APP_COMPATIBLE_PRE_V3_1_BOOTLOADERS
-            bool "App compatible with bootloader and partition table before ESP-IDF v3.1"
+            bool "应用程序与ESP-IDF v3.1之前的引导加载程序和分区表兼容"
             depends on IDF_TARGET_ESP32
             default n
             help
-                Partition tables before ESP-IDF V3.1 do not contain an MD5 checksum
-                field, and the bootloader before ESP-IDF v3.1 cannot read a partition
-                table that contains an MD5 checksum field.
+                ESP-IDF V3.1之前的分区表不包含MD5校验和字段，
+                ESP-IDF v3.1之前的引导加载程序无法读取包含MD5校验和字段的分区表。
 
-                Enable this option only if your app needs to boot on a bootloader and/or
-                partition table that was generated from a version *before* ESP-IDF v3.1.
+                仅当您的应用程序需要在由ESP-IDF v3.1之前的版本生成的引导加载程序和/或
+                分区表上引导时，才启用此选项。
 
-                If this option and Flash Encryption are enabled at the same time, and any
-                data partitions in the partition table are marked Encrypted, then the
-                partition encrypted flag should be manually verified in the app before accessing
-                the partition (see CVE-2021-27926).
+                如果同时启用此选项和Flash加密，并且分区表中的任何数据分区被标记为加密，
+                则在访问分区之前应在应用程序中手动验证分区加密标志（参见CVE-2021-27926）。
 
         config APP_INIT_CLK
             bool
@@ -335,91 +309,88 @@ mainmenu "Espressif IoT Development Framework Configuration"
 
     source "$COMPONENT_KCONFIGS_PROJBUILD_SOURCE_FILE"
 
-    menu "Compiler options"
+    menu "编译器选项"
 
         choice COMPILER_OPTIMIZATION
-            prompt "Optimization Level"
+            prompt "优化级别"
             default COMPILER_OPTIMIZATION_DEBUG
             help
-                This option sets compiler optimization level (gcc -O argument) for the app.
+                此选项设置应用程序的编译器优化级别（gcc -O 参数）。
 
-                - The "Debug" setting will add the -0g flag to CFLAGS.
-                - The "Size" setting will add the -0s flag to CFLAGS.
-                - The "Performance" setting will add the -O2 flag to CFLAGS.
-                - The "None" setting will add the -O0 flag to CFLAGS.
+                - "调试"设置将向 CFLAGS 添加 -0g 标志。
+                - "大小"设置将向 CFLAGS 添加 -0s 标志。
+                - "性能"设置将向 CFLAGS 添加 -O2 标志。
+                - "无"设置将向 CFLAGS 添加 -O0 标志。
 
-                The "Size" setting cause the compiled code to be smaller and faster, but
-                may lead to difficulties of correlating code addresses to source file
-                lines when debugging.
+                "大小"设置会使编译后的代码更小更快，但可能会导致调试时
+                难以将代码地址与源文件行相关联。
 
-                The "Performance" setting causes the compiled code to be larger and faster,
-                but will be easier to correlated code addresses to source file lines.
+                "性能"设置会使编译后的代码更大更快，但将更容易将代码地址
+                与源文件行相关联。
 
-                "None" with -O0 produces compiled code without optimization.
+                "无"设置使用 -O0 产生未经优化的编译代码。
 
-                Note that custom optimization levels may be unsupported.
+                请注意，自定义优化级别可能不受支持。
 
-                Compiler optimization for the IDF bootloader is set separately,
-                see the BOOTLOADER_COMPILER_OPTIMIZATION setting.
+                IDF 引导加载程序的编译器优化是单独设置的，
+                请参阅 BOOTLOADER_COMPILER_OPTIMIZATION 设置。
 
             config COMPILER_OPTIMIZATION_DEBUG
-                bool "Debug (-Og)"
+                bool "调试 (-Og)"
             config COMPILER_OPTIMIZATION_SIZE
-                bool "Optimize for size (-Os)"
+                bool "优化大小 (-Os)"
             config COMPILER_OPTIMIZATION_PERF
-                bool "Optimize for performance (-O2)"
+                bool "优化性能 (-O2)"
             config COMPILER_OPTIMIZATION_NONE
-                bool "Debug without optimization (-O0)"
+                bool "无优化调试 (-O0)"
 
         endchoice
 
         choice COMPILER_OPTIMIZATION_ASSERTION_LEVEL
-            prompt "Assertion level"
+            prompt "断言级别"
             default COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE
             help
-                Assertions can be:
+                断言可以是：
 
-                - Enabled. Failure will print verbose assertion details. This is the default.
+                - 启用。失败时将打印详细的断言信息。这是默认设置。
 
-                - Set to "silent" to save code size (failed assertions will abort() but user
-                  needs to use the aborting address to find the line number with the failed assertion.)
+                - 设置为"静默"以节省代码大小（失败的断言将调用 abort()，但用户
+                  需要使用中止地址来找到失败断言的行号。）
 
-                - Disabled entirely (not recommended for most configurations.) -DNDEBUG is added
-                  to CPPFLAGS in this case.
+                - 完全禁用（不推荐用于大多数配置。）在这种情况下，-DNDEBUG 被添加
+                  到 CPPFLAGS。
 
             config COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE
-                prompt "Enabled"
+                prompt "启用"
                 bool
                 help
-                    Enable assertions. Assertion content and line number will be printed on failure.
+                    启用断言。失败时将打印断言内容和行号。
 
             config COMPILER_OPTIMIZATION_ASSERTIONS_SILENT
-                prompt "Silent (saves code size)"
+                prompt "静默（节省代码大小）"
                 bool
                 help
-                    Enable silent assertions. Failed assertions will abort(), user needs to
-                    use the aborting address to find the line number with the failed assertion.
+                    启用静默断言。失败的断言将调用 abort()，用户需要
+                    使用中止地址来找到失败断言的行号。
 
             config COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE
-                prompt "Disabled (sets -DNDEBUG)"
+                prompt "禁用（设置 -DNDEBUG）"
                 bool
                 help
-                    If assertions are disabled, -DNDEBUG is added to CPPFLAGS.
+                    如果禁用断言，-DNDEBUG 将被添加到 CPPFLAGS。
 
         endchoice # assertions
 
         choice COMPILER_FLOAT_LIB_FROM
-            prompt "Compiler float lib source"
+            prompt "编译器浮点库来源"
             default COMPILER_FLOAT_LIB_FROM_RVFPLIB if ESP_ROM_HAS_RVFPLIB
             default COMPILER_FLOAT_LIB_FROM_GCCLIB
             help
-                In the soft-fp part of libgcc, riscv version is written in C,
-                and handles all edge cases in IEEE754, which makes it larger
-                and performance is slow.
+                在 libgcc 的软浮点部分中，RISC-V 版本是用 C 编写的，
+                并处理 IEEE754 中的所有边缘情况，这使得它更大且性能较慢。
 
-                RVfplib is an optimized RISC-V library for FP arithmetic on 32-bit
-                integer processors, for single and double-precision FP.
-                RVfplib is "fast", but it has a few exceptions from IEEE 754 compliance.
+                RVfplib 是一个针对 32 位整数处理器优化的 RISC-V 库，用于单精度和双精度浮点运算。
+                RVfplib 是"快速"的，但它与 IEEE 754 标准有一些例外。
 
             config COMPILER_FLOAT_LIB_FROM_GCCLIB
                 bool "libgcc"
@@ -435,156 +406,152 @@ mainmenu "Espressif IoT Development Framework Configuration"
             default 2 if COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE
 
         config COMPILER_OPTIMIZATION_CHECKS_SILENT
-            bool "Disable messages in ESP_RETURN_ON_* and ESP_EXIT_ON_* macros"
+            bool "在 ESP_RETURN_ON_* 和 ESP_EXIT_ON_* 宏中禁用消息"
             default n
             help
-                If enabled, the error messages will be discarded in following check macros:
+                如果启用，以下检查宏中的错误消息将被丢弃：
                 - ESP_RETURN_ON_ERROR
                 - ESP_EXIT_ON_ERROR
                 - ESP_RETURN_ON_FALSE
                 - ESP_EXIT_ON_FALSE
 
         menuconfig COMPILER_HIDE_PATHS_MACROS
-            bool "Replace ESP-IDF and project paths in binaries"
+            bool "在二进制文件中替换 ESP-IDF 和项目路径"
             default y
             help
-                When expanding the __FILE__ and __BASE_FILE__ macros, replace paths inside ESP-IDF
-                with paths relative to the placeholder string "IDF", and convert paths inside the
-                project directory to relative paths.
+                在展开 __FILE__ 和 __BASE_FILE__ 宏时，将 ESP-IDF 内的路径
+                替换为相对于占位符字符串"IDF"的路径，并将项目目录内的路径
+                转换为相对路径。
 
-                This allows building the project with assertions or other code that embeds file paths,
-                without the binary containing the exact path to the IDF or project directories.
+                这允许在构建带有断言或其他嵌入文件路径的代码的项目时，
+                二进制文件中不包含 IDF 或项目目录的确切路径。
 
-                This option passes -fmacro-prefix-map options to the GCC command line. To replace additional
-                paths in your binaries, modify the project CMakeLists.txt file to pass custom -fmacro-prefix-map or
-                -ffile-prefix-map arguments.
+                此选项向 GCC 命令行传递 -fmacro-prefix-map 选项。要替换二进制文件中
+                的其他路径，请修改项目 CMakeLists.txt 文件以传递自定义的 -fmacro-prefix-map 
+                或 -ffile-prefix-map 参数。
 
         menuconfig COMPILER_CXX_EXCEPTIONS
-            bool "Enable C++ exceptions"
+            bool "启用 C++ 异常"
             default n
             help
-                Enabling this option compiles all IDF C++ files with exception support enabled.
+                启用此选项会使所有 IDF C++ 文件在编译时启用异常支持。
 
-                Disabling this option disables C++ exception support in all compiled files, and any libstdc++ code
-                which throws an exception will abort instead.
+                禁用此选项会在所有编译文件中禁用 C++ 异常支持，任何抛出异常的 libstdc++ 代码
+                将会中止。
 
-                Enabling this option currently adds an additional ~500 bytes of heap overhead
-                when an exception is thrown in user code for the first time.
+                目前启用此选项会在用户代码首次抛出异常时增加约 500 字节的堆开销。
 
         config COMPILER_CXX_EXCEPTIONS_EMG_POOL_SIZE
-            int "Emergency Pool Size"
+            int "紧急池大小"
             default 0
             depends on COMPILER_CXX_EXCEPTIONS
             help
-                Size (in bytes) of the emergency memory pool for C++ exceptions. This pool will be used to allocate
-                memory for thrown exceptions when there is not enough memory on the heap.
+                C++ 异常的紧急内存池大小（以字节为单位）。当堆上没有足够的内存来分配
+                抛出的异常时，将使用此池来分配内存。
 
         config COMPILER_CXX_RTTI
-            bool "Enable C++ run-time type info (RTTI)"
+            bool "启用 C++ 运行时类型信息 (RTTI)"
             default n
             help
-                Enabling this option compiles all C++ files with RTTI support enabled.
-                This increases binary size (typically by tens of kB) but allows using
-                dynamic_cast conversion and typeid operator.
+                启用此选项会使所有 C++ 文件在编译时启用 RTTI 支持。
+                这会增加二进制大小（通常几十 KB），但允许使用
+                dynamic_cast 转换和 typeid 运算符。
 
         choice COMPILER_STACK_CHECK_MODE
-            prompt "Stack smashing protection mode"
+            prompt "栈粉碎保护模式"
             default COMPILER_STACK_CHECK_MODE_NONE
             help
-                Stack smashing protection mode. Emit extra code to check for buffer overflows, such as stack
-                smashing attacks. This is done by adding a guard variable to functions with vulnerable objects.
-                The guards are initialized when a function is entered and then checked when the function exits.
-                If a guard check fails, program is halted. Protection has the following modes:
+                栈粉碎保护模式。发出额外的代码以检查缓冲区溢出，例如栈
+                粉碎攻击。这是通过向具有易受攻击对象的函数添加一个保护
+                变量来实现的。在函数进入时初始化保护，然后在函数退出时
+                检查。如果保护检查失败，程序将停止。保护有以下模式：
 
-                - In NORMAL mode (GCC flag: -fstack-protector) only functions that call alloca, and functions with
-                  buffers larger than 8 bytes are protected.
+                - 在 NORMAL 模式下（GCC 标志：-fstack-protector），只有调用 alloca 的函数
+                  和缓冲区大于 8 字节的函数受到保护。
 
-                - STRONG mode (GCC flag: -fstack-protector-strong) is like NORMAL, but includes additional functions
-                  to be protected -- those that have local array definitions, or have references to local frame
-                  addresses.
+                - STRONG 模式（GCC 标志：-fstack-protector-strong）类似于 NORMAL，
+                  但包括额外的受保护函数 -- 那些有本地数组定义或有本地帧地址引用的函数。
 
-                - In OVERALL mode (GCC flag: -fstack-protector-all) all functions are protected.
+                - 在 OVERALL 模式下（GCC 标志：-fstack-protector-all），所有函数都受到保护。
 
-                Modes have the following impact on code performance and coverage:
+                模式对代码性能和覆盖范围的影响如下：
 
-                - performance: NORMAL > STRONG > OVERALL
+                - 性能：NORMAL > STRONG > OVERALL
 
-                - coverage: NORMAL < STRONG < OVERALL
+                - 覆盖范围：NORMAL < STRONG < OVERALL
 
-                The performance impact includes increasing the amount of stack memory required for each task.
+                性能影响包括增加每个任务所需的栈内存量。
 
             config COMPILER_STACK_CHECK_MODE_NONE
-                bool "None"
+                bool "无"
             config COMPILER_STACK_CHECK_MODE_NORM
-                bool "Normal"
+                bool "正常"
             config COMPILER_STACK_CHECK_MODE_STRONG
-                bool "Strong"
+                bool "强"
             config COMPILER_STACK_CHECK_MODE_ALL
-                bool "Overall"
+                bool "全面"
         endchoice
 
         config COMPILER_STACK_CHECK
             bool
             default !COMPILER_STACK_CHECK_MODE_NONE
             help
-                Stack smashing protection.
+                栈粉碎保护。
 
         config COMPILER_WARN_WRITE_STRINGS
-            bool "Enable -Wwrite-strings warning flag"
+            bool "启用 -Wwrite-strings 警告标志"
             default "n"
             help
-                Adds -Wwrite-strings flag for the C/C++ compilers.
+                为 C/C++ 编译器添加 -Wwrite-strings 标志。
 
-                For C, this gives string constants the type ``const char[]`` so that
-                copying the address of one into a non-const ``char *`` pointer
-                produces a warning. This warning helps to find at compile time code
-                that tries to write into a string constant.
+                对于 C，这会给字符串常量赋予 ``const char[]`` 类型，因此
+                将其地址复制到非 const 的 ``char *`` 指针时会产生警告。
+                这个警告有助于在编译时发现试图写入字符串常量的代码。
 
-                For C++, this warns about the deprecated conversion from string
-                literals to ``char *``.
+                对于 C++，这会警告将字符串字面量转换为 ``char *`` 的已弃用做法。
 
         config COMPILER_SAVE_RESTORE_LIBCALLS
-            bool "Enable -msave-restore flag to reduce code size"
+            bool "启用 -msave-restore 标志以减小代码大小"
             depends on IDF_TARGET_ARCH_RISCV
             help
-                Adds -msave-restore to C/C++ compilation flags.
+                向 C/C++ 编译标志添加 -msave-restore。
 
-                When this flag is enabled, compiler will call library functions to
-                save/restore registers in function prologues/epilogues. This results
-                in lower overall code size, at the expense of slightly reduced performance.
+                当启用此标志时，编译器将调用库函数来在函数序言/尾声中
+                保存/恢复寄存器。这会导致整体代码大小减小，但代价是
+                性能略有下降。
 
-                This option can be enabled for RISC-V targets only.
+                此选项仅适用于 RISC-V 目标。
 
         config COMPILER_DISABLE_GCC12_WARNINGS
-            bool "Disable new warnings introduced in GCC 12"
+            bool "禁用 GCC 12 中引入的新警告"
             default "n"
             help
-                Enable this option if use GCC 12 or newer, and want to disable warnings which don't appear with
-                GCC 11.
+                如果使用 GCC 12 或更新版本，并且想禁用 GCC 11 中不出现的警告，
+                请启用此选项。
 
         config COMPILER_DISABLE_GCC13_WARNINGS
-            bool "Disable new warnings introduced in GCC 13"
+            bool "禁用 GCC 13 中引入的新警告"
             default "n"
             help
-                Enable this option if use GCC 13 or newer, and want to disable warnings which don't appear with
-                GCC 12.
+                如果使用 GCC 13 或更新版本，并且想禁用 GCC 12 中不出现的警告，
+                请启用此选项。
 
         config COMPILER_DUMP_RTL_FILES
-            bool "Dump RTL files during compilation"
+            bool "在编译期间转储 RTL 文件"
             help
-                If enabled, RTL files will be produced during compilation. These files
-                can be used by other tools, for example to calculate call graphs.
+                如果启用，在编译期间将生成 RTL 文件。这些文件
+                可以被其他工具使用，例如计算调用图。
 
         choice COMPILER_RT_LIB
-            prompt "Compiler runtime library"
+            prompt "编译器运行时库"
             default COMPILER_RT_LIB_CLANGRT if IDF_TOOLCHAIN_CLANG
             default COMPILER_RT_LIB_HOST if IDF_TARGET_LINUX
             default COMPILER_RT_LIB_GCCLIB
             help
-                Select runtime library to be used by compiler.
-                - GCC toolchain supports libgcc only.
-                - Clang allows to choose between libgcc or libclang_rt.
-                - For host builds ("linux" target), uses the default library.
+                选择编译器使用的运行时库。
+                - GCC 工具链仅支持 libgcc。
+                - Clang 允许在 libgcc 或 libclang_rt 之间选择。
+                - 对于主机构建（"linux" 目标），使用默认库。
 
             config COMPILER_RT_LIB_GCCLIB
                 depends on !IDF_TARGET_LINUX
@@ -604,42 +571,42 @@ mainmenu "Espressif IoT Development Framework Configuration"
             default "" if COMPILER_RT_LIB_HOST
 
         choice COMPILER_ORPHAN_SECTIONS
-            prompt "Orphan sections handling"
+            prompt "孤立段处理"
             default COMPILER_ORPHAN_SECTIONS_PLACE
             depends on !IDF_TARGET_LINUX
             help
-                If the linker finds orphan sections, it attempts to place orphan sections after sections of the same
-                attribute such as code vs data, loadable vs non-loadable, etc.
-                That means that orphan sections could placed between sections defined in IDF linker scripts.
-                This could lead to corruption of the binary image. Configure the linker action here.
+                如果链接器发现孤立段，它会尝试将孤立段放置在具有相同属性的段之后，
+                例如代码与数据、可加载与不可加载等。
+                这意味着孤立段可能会被放置在 IDF 链接器脚本定义的段之间。
+                这可能导致二进制映像的损坏。在此配置链接器操作。
 
             config COMPILER_ORPHAN_SECTIONS_WARNING
-                bool "Place with warning"
+                bool "放置并警告"
                 help
-                    Places orphan sections without a warning message.
+                    放置孤立段并发出警告消息。
 
             config COMPILER_ORPHAN_SECTIONS_PLACE
-                bool "Place silently"
+                bool "静默放置"
                 help
-                    Places orphan sections without a warning/error message.
+                    放置孤立段而不发出警告/错误消息。
         endchoice
 
     endmenu # Compiler Options
 
-    menu "Component config"
+    menu "组件配置"
         source "$COMPONENT_KCONFIGS_SOURCE_FILE"
     endmenu
 
     config IDF_EXPERIMENTAL_FEATURES
-        bool "Make experimental features visible"
+        bool "显示实验性功能"
         default "n"
         help
-            By enabling this option, ESP-IDF experimental feature options will be visible.
+            通过启用此选项，ESP-IDF 实验性功能选项将可见。
 
-            Note you should still enable a certain experimental feature option to use it, and you
-            should read the corresponding risk warning and known issue list carefully.
+            请注意，您仍然需要启用特定的实验性功能选项才能使用它，并且
+            您应该仔细阅读相应的风险警告和已知问题列表。
 
-            Current experimental feature list:
+            当前实验性功能列表：
 
             - CONFIG_ESPTOOLPY_FLASHFREQ_120M && CONFIG_ESPTOOLPY_FLASH_SAMPLE_MODE_DTR
             - CONFIG_SPIRAM_SPEED_120M && CONFIG_SPIRAM_MODE_OCT

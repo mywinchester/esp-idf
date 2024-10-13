@@ -1,69 +1,65 @@
-menu "eFuse Bit Manager"
+menu "eFuse 位管理器"
 
     config EFUSE_CUSTOM_TABLE
-        bool "Use custom eFuse table"
+        bool "使用自定义 eFuse 表"
         default n
         help
-            Allows to generate a structure for eFuse from the CSV file.
+            允许从CSV文件生成eFuse的结构。
 
     config EFUSE_CUSTOM_TABLE_FILENAME
-        string "Custom eFuse CSV file"
+        string "自定义 eFuse CSV 文件"
         depends on EFUSE_CUSTOM_TABLE
         default "main/esp_efuse_custom_table.csv"
         help
-            Name of the custom eFuse CSV filename. This path is evaluated
-            relative to the project root directory.
+            自定义eFuse CSV文件的名称。此路径相对于项目根目录进行评估。
 
     config EFUSE_VIRTUAL
-        bool "Simulate eFuse operations in RAM"
+        bool "在 RAM 中模拟 eFuse 操作"
         default n
         help
-            If "n" - No virtual mode. All eFuse operations are real and use eFuse registers.
-            If "y" - The virtual mode is enabled and all eFuse operations (read and write) are redirected
-            to RAM instead of eFuse registers, all permanent changes (via eFuse) are disabled.
-            Log output will state changes that would be applied, but they will not be.
+            如果为"n" - 无虚拟模式。所有eFuse操作都是真实的，并使用eFuse寄存器。
+            如果为"y" - 虚拟模式被启用，所有eFuse操作（读和写）都被重定向到RAM而不是eFuse寄存器，
+            所有永久性更改（通过eFuse）都被禁用。日志输出将显示将要应用的更改，但实际上不会应用。
 
-            If it is "y", then SECURE_FLASH_ENCRYPTION_MODE_RELEASE cannot be used.
-            Because the EFUSE VIRT mode is for testing only.
+            如果为"y"，则不能使用SECURE_FLASH_ENCRYPTION_MODE_RELEASE。
+            因为EFUSE VIRT模式仅用于测试。
 
-            During startup, the eFuses are copied into RAM. This mode is useful for fast tests.
+            在启动期间，eFuses被复制到RAM中。这种模式对于快速测试很有用。
 
     config EFUSE_VIRTUAL_KEEP_IN_FLASH
-        bool "Keep eFuses in flash"
+        bool "在闪存中保留 eFuses"
         depends on EFUSE_VIRTUAL
         help
-            In addition to the "Simulate eFuse operations in RAM" option, this option just adds
-            a feature to keep eFuses after reboots in flash memory. To use this mode the partition_table
-            should have the `efuse` partition. partition.csv: "efuse_em, data, efuse,   ,   0x2000,"
+            除了"在RAM中模拟eFuse操作"选项外，此选项只是添加了一个功能，
+            在重启后将eFuses保存在闪存中。要使用此模式，partition_table应该有`efuse`分区。
+            partition.csv: "efuse_em, data, efuse,   ,   0x2000,"
 
-            During startup, the eFuses are copied from flash or,
-            in case if flash is empty, from real eFuse to RAM and then update flash.
-            This mode is useful when need to keep changes after reboot
-            (testing secure_boot and flash_encryption).
+            在启动期间，eFuses从闪存复制，或者如果闪存为空，则从真实eFuse复制到RAM，然后更新闪存。
+            当需要在重启后保持更改时（测试secure_boot和flash_encryption），这种模式很有用。
 
     config EFUSE_VIRTUAL_LOG_ALL_WRITES
-        bool "Log all virtual writes"
+        bool "记录所有虚拟写入"
         depends on EFUSE_VIRTUAL
         help
-            If enabled, log efuse burns. This shows changes that would be made.
+            如果启用，记录efuse烧写。这将显示将要进行的更改。
 
     choice EFUSE_CODE_SCHEME_SELECTOR
-        prompt "Coding Scheme Compatibility"
+        prompt "编码方案兼容性"
         default EFUSE_CODE_SCHEME_COMPAT_3_4
         depends on IDF_TARGET_ESP32
         help
-            Selector eFuse code scheme.
+            eFuse编码方案选择器。
 
         config EFUSE_CODE_SCHEME_COMPAT_NONE
-            bool "None Only"
+            bool "仅无"
         config EFUSE_CODE_SCHEME_COMPAT_3_4
-            bool "3/4 and None"
+            bool "3/4 和无"
         config EFUSE_CODE_SCHEME_COMPAT_REPEAT
-            bool "Repeat, 3/4 and None (common table does not support it)"
+            bool "重复、3/4 和无（通用表不支持）"
     endchoice
 
     config EFUSE_MAX_BLK_LEN
-        int
+        int "最大块长度"
         default 256 if EFUSE_CODE_SCHEME_COMPAT_NONE
         default 192 if EFUSE_CODE_SCHEME_COMPAT_3_4
         default 128 if EFUSE_CODE_SCHEME_COMPAT_REPEAT
