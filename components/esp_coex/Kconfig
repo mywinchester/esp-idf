@@ -1,5 +1,5 @@
 
-menu "Wireless Coexistence"
+menu "无线共存"
 
     config ESP_COEX_ENABLED
         bool
@@ -7,37 +7,35 @@ menu "Wireless Coexistence"
 
     if(ESP_COEX_ENABLED)
         config ESP_COEX_SW_COEXIST_ENABLE
-            bool "Software controls WiFi/Bluetooth coexistence"
+            bool "软件控制WiFi/蓝牙共存"
             depends on (ESP_WIFI_ENABLED && BT_ENABLED) || \
                 (ESP_WIFI_ENABLED && IEEE802154_ENABLED)   || \
                 (IEEE802154_ENABLED && BT_ENABLED)
             default y
             select ESP_WIFI_STA_DISCONNECTED_PM_ENABLE if (ESP_WIFI_ENABLED)
             help
-                If enabled, WiFi & Bluetooth coexistence is controlled by software rather than hardware.
-                Recommended for heavy traffic scenarios. Both coexistence configuration options are
-                automatically managed, no user intervention is required.
-                If only Bluetooth is used, it is recommended to disable this option to reduce binary file
-                size.
+                如果启用，WiFi和蓝牙的共存将由软件而不是硬件控制。
+                推荐用于高流量场景。两种共存配置选项都会自动管理，无需用户干预。
+                如果只使用蓝牙，建议禁用此选项以减小二进制文件大小。
 
         config ESP_COEX_EXTERNAL_COEXIST_ENABLE
-            bool "External Coexistence"
+            bool "外部共存"
             default n
             depends on (!(BT_ENABLED||NIMBLE_ENABLED)&&(!IDF_TARGET_ESP32))
             help
-                If enabled, HW External coexistence arbitration is managed by GPIO pins.
-                It can support three types of wired combinations so far which are 1-wired/2-wired/3-wired.
-                User can select GPIO pins in application code with configure interfaces.
+                如果启用，硬件外部共存仲裁将由GPIO引脚管理。
+                目前可以支持三种有线组合，分别是1线/2线/3线。
+                用户可以在应用程序代码中使用配置接口选择GPIO引脚。
 
-                This function depends on BT-off
-                because currently we do not support external coex and internal coex simultaneously.
+                此功能依赖于蓝牙关闭，
+                因为目前我们不支持同时使用外部共存和内部共存。
 
         config ESP_COEX_POWER_MANAGEMENT
-            bool "Support power management under coexistence"
+            bool "支持共存下的电源管理"
             default n
             depends on (ESP_COEX_SW_COEXIST_ENABLE)
             help
-                If enabled, coexist power management will be enabled.
+                如果启用，将启用共存电源管理。
     endif
 
 endmenu  # Wireless Coexistence

@@ -1,24 +1,24 @@
-menu "ESP-Driver:PCNT Configurations"
+menu "ESP-驱动：PCNT 配置"
     depends on SOC_PCNT_SUPPORTED
     config PCNT_CTRL_FUNC_IN_IRAM
-        bool "Place PCNT control functions into IRAM"
+        bool "将 PCNT 控制函数放入 IRAM"
         default n
         help
-            Place PCNT control functions (like start/stop) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
-            Enabling this option can improve driver performance as well.
+            将 PCNT 控制函数（如启动/停止）放入 IRAM，
+            以便这些函数可以在 IRAM 中安全运行，并能够在其他 IRAM 中断上下文中被调用。
+            启用此选项还可以提高驱动程序的性能。
 
     config PCNT_ISR_IRAM_SAFE
-        bool "PCNT ISR IRAM-Safe"
+        bool "PCNT ISR IRAM 安全"
         default n
         help
-            Ensure the PCNT interrupt is IRAM-Safe by allowing the interrupt handler to be
-            executable when the cache is disabled (e.g. SPI Flash write).
+            通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+            确保 PCNT 中断是 IRAM 安全的。
 
     config PCNT_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            whether to enable the debug log message for PCNT driver.
-            Note that, this option only controls the PCNT driver log, won't affect other drivers.
+            是否为 PCNT 驱动程序启用调试日志消息。
+            注意，此选项仅控制 PCNT 驱动程序日志，不会影响其他驱动程序。
 endmenu

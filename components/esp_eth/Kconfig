@@ -1,4 +1,4 @@
-menu "Ethernet"
+menu "以太网"
 
     # Invisible item that is enabled if any Ethernet selection is made
     config ETH_ENABLED
@@ -6,43 +6,43 @@ menu "Ethernet"
 
     menuconfig ETH_USE_ESP32_EMAC
         depends on SOC_EMAC_SUPPORTED
-        bool "Support ESP32 internal EMAC controller"
+        bool "支持ESP32内部EMAC控制器"
         default y
         select ETH_ENABLED
         help
-            ESP32 integrates a 10/100M Ethernet MAC controller.
+            ESP32集成了一个10/100M以太网MAC控制器。
 
     if ETH_USE_ESP32_EMAC
         choice ETH_PHY_INTERFACE
-            prompt "PHY interface"
+            prompt "PHY接口"
             default ETH_PHY_INTERFACE_RMII
             help
-                Select the communication interface between MAC and PHY chip.
+                选择MAC和PHY芯片之间的通信接口。
 
             config ETH_PHY_INTERFACE_RMII
-                bool "Reduced Media Independent Interface (RMII)"
+                bool "简化媒体独立接口（RMII）"
         endchoice
 
         if ETH_PHY_INTERFACE_RMII
             choice ETH_RMII_CLK_MODE # IDF-9724
                 depends on IDF_TARGET_ESP32
-                prompt "RMII clock mode"
+                prompt "RMII时钟模式"
                 default ETH_RMII_CLK_INPUT
                 help
-                    Select external or internal RMII clock.
+                    选择外部或内部RMII时钟。
 
                 config ETH_RMII_CLK_INPUT
-                    bool "Input RMII clock from external"
+                    bool "从外部输入RMII时钟"
                     help
-                        MAC will get RMII clock from outside.
-                        Note that ESP32 only supports GPIO0 to input the RMII clock.
+                        MAC将从外部获取RMII时钟。
+                        注意，ESP32只支持从GPIO0输入RMII时钟。
 
                 config ETH_RMII_CLK_OUTPUT
-                    bool "Output RMII clock from internal"
+                    bool "从内部输出RMII时钟"
                     help
-                        ESP32 can generate RMII clock by internal APLL.
-                        This clock can be routed to the external PHY device.
-                        ESP32 supports to route the RMII clock to GPIO0/16/17.
+                        ESP32可以通过内部APLL生成RMII时钟。
+                        这个时钟可以路由到外部PHY设备。
+                        ESP32支持将RMII时钟路由到GPIO0/16/17。
             endchoice
         endif # ETH_PHY_INTERFACE_RMII
 
@@ -53,141 +53,139 @@ menu "Ethernet"
                 range 0 0
                 default 0
                 help
-                    ESP32 only supports GPIO0 to input the RMII clock.
+                    ESP32只支持从GPIO0输入RMII时钟。
         endif # ETH_RMII_CLK_INPUT
 
         if ETH_RMII_CLK_OUTPUT
             config ETH_RMII_CLK_OUTPUT_GPIO0
                 depends on IDF_TARGET_ESP32
-                bool "Output RMII clock from GPIO0 (Experimental!)"
+                bool "从GPIO0输出RMII时钟（实验性！）"
                 default n
                 help
-                    GPIO0 can be set to output a pre-divided PLL clock (test only!).
-                    Enabling this option will configure GPIO0 to output a 50MHz clock.
-                    In fact this clock doesn't have directly relationship with EMAC peripheral.
-                    Sometimes this clock won't work well with your PHY chip. You might need to
-                    add some extra devices after GPIO0 (e.g. inverter).
-                    Note that outputting RMII clock on GPIO0 is an experimental practice.
-                    If you want the Ethernet to work with WiFi, don't select GPIO0 output mode for stability.
+                    GPIO0可以被设置为输出预分频的PLL时钟（仅用于测试！）。
+                    启用此选项将配置GPIO0输出50MHz的时钟。
+                    实际上，这个时钟与EMAC外设没有直接关系。
+                    有时这个时钟可能无法与您的PHY芯片很好地配合。您可能需要在GPIO0之后
+                    添加一些额外的设备（例如，反相器）。
+                    注意，在GPIO0上输出RMII时钟是一种实验性做法。
+                    如果您希望以太网与WiFi一起工作，为了稳定性，请不要选择GPIO0输出模式。
 
             if !ETH_RMII_CLK_OUTPUT_GPIO0
                 config ETH_RMII_CLK_OUT_GPIO
                     depends on IDF_TARGET_ESP32
-                    int "RMII clock GPIO number"
+                    int "RMII时钟GPIO编号"
                     range 16 17
                     default 17
                     help
-                        Set the GPIO number to output RMII Clock.
+                        设置用于输出RMII时钟的GPIO编号。
             endif # !ETH_RMII_CLK_OUTPUT_GPIO0
         endif # ETH_RMII_CLK_OUTPUT
 
         config ETH_DMA_BUFFER_SIZE
-            int "Ethernet DMA buffer size (Byte)"
+            int "以太网DMA缓冲区大小（字节）"
             range 256 1600
             default 512
             help
-                Set the size of each buffer used by Ethernet MAC DMA.
-                !! Important !! Make sure it is 64B aligned for ESP32P4!
+                设置以太网MAC DMA使用的每个缓冲区的大小。
+                !! 重要 !! 确保对于ESP32P4来说，它是64字节对齐的！
 
         config ETH_DMA_RX_BUFFER_NUM
-            int "Amount of Ethernet DMA Rx buffers"
+            int "以太网DMA接收缓冲区数量"
             range 3 30
             default 10 if IDF_TARGET_ESP32
             default 20 if IDF_TARGET_ESP32P4 #ESP32P4 has smaller internal Rx FIFO
             help
-                Number of DMA receive buffers. Each buffer's size is ETH_DMA_BUFFER_SIZE.
-                Larger number of buffers could increase throughput somehow.
+                DMA接收缓冲区的数量。每个缓冲区的大小为ETH_DMA_BUFFER_SIZE。
+                更多的缓冲区可能会在某种程度上提高吞吐量。
 
         config ETH_DMA_TX_BUFFER_NUM
-            int "Amount of Ethernet DMA Tx buffers"
+            int "以太网DMA发送缓冲区数量"
             range 3 30
             default 10
             help
-                Number of DMA transmit buffers. Each buffer's size is ETH_DMA_BUFFER_SIZE.
-                Larger number of buffers could increase throughput somehow.
+                DMA发送缓冲区的数量。每个缓冲区的大小为ETH_DMA_BUFFER_SIZE。
+                更多的缓冲区可能会在某种程度上提高吞吐量。
 
         if ETH_DMA_RX_BUFFER_NUM > 15
             config ETH_SOFT_FLOW_CONTROL
-                bool "Enable software flow control"
+                bool "启用软件流控制"
                 default n
                 help
-                    Ethernet MAC engine on ESP32 doesn't feature a flow control logic.
-                    The MAC driver can perform a software flow control if you enable this option.
-                    Note that, if the RX buffer number is small, enabling software flow control will
-                    cause obvious performance loss.
+                    ESP32上的以太网MAC引擎不具备流控制逻辑。
+                    如果您启用此选项，MAC驱动程序可以执行软件流控制。
+                    注意，如果RX缓冲区数量较小，启用软件流控制将导致明显的性能损失。
         endif
 
         config ETH_IRAM_OPTIMIZATION
-            bool "Enable IRAM optimization"
+            bool "启用IRAM优化"
             default n
             help
-                If enabled, functions related to RX/TX are placed into IRAM. It can improve Ethernet throughput.
-                If disabled, all functions are placed into FLASH.
+                如果启用，与RX/TX相关的函数将被放置到IRAM中。这可以提高以太网吞吐量。
+                如果禁用，所有函数都将被放置到FLASH中。
 
     endif # ETH_USE_ESP32_EMAC
 
     menuconfig ETH_USE_SPI_ETHERNET
-        bool "Support SPI to Ethernet Module"
+        bool "支持SPI转以太网模块"
         default y
         select ETH_ENABLED
         help
-            ESP-IDF can also support some SPI-Ethernet modules.
+            ESP-IDF还可以支持一些SPI-以太网模块。
 
     if ETH_USE_SPI_ETHERNET
         config ETH_SPI_ETHERNET_DM9051
-            bool "Use DM9051"
+            bool "使用DM9051"
             help
-                DM9051 is a fast Ethernet controller with an SPI interface.
-                It's also integrated with a 10/100M PHY and MAC.
-                Select this to enable DM9051 driver.
+                DM9051是一个具有SPI接口的快速以太网控制器。
+                它还集成了10/100M PHY和MAC。
+                选择此项以启用DM9051驱动程序。
 
         config ETH_SPI_ETHERNET_W5500
-            bool "Use W5500 (MAC RAW)"
+            bool "使用W5500（MAC原始模式）"
             help
-                W5500 is a HW TCP/IP embedded Ethernet controller.
-                TCP/IP stack, 10/100 Ethernet MAC and PHY are embedded in a single chip.
-                However the driver in ESP-IDF only enables the RAW MAC mode,
-                making it compatible with the software TCP/IP stack.
-                Say yes to enable W5500 driver.
+                W5500是一个硬件TCP/IP嵌入式以太网控制器。
+                TCP/IP协议栈、10/100以太网MAC和PHY都集成在一个芯片中。
+                然而，ESP-IDF中的驱动程序只启用了原始MAC模式，
+                使其与软件TCP/IP协议栈兼容。
+                选择是以启用W5500驱动程序。
 
         config ETH_SPI_ETHERNET_KSZ8851SNL
-            bool "Use KSZ8851SNL"
+            bool "使用KSZ8851SNL"
             help
-                The KSZ8851SNL is a single-chip Fast Ethernet controller consisting of
-                a 10/100 physical layer transceiver (PHY), a MAC, and a Serial Peripheral Interface (SPI).
-                Select this to enable KSZ8851SNL driver.
+                KSZ8851SNL是一个单芯片快速以太网控制器，由
+                10/100物理层收发器（PHY）、MAC和串行外设接口（SPI）组成。
+                选择此项以启用KSZ8851SNL驱动程序。
     endif # ETH_USE_SPI_ETHERNET
 
     menuconfig ETH_USE_OPENETH
-        bool "Support OpenCores Ethernet MAC (for use with QEMU)"
+        bool "支持OpenCores以太网MAC（用于QEMU）"
         default n
         select ETH_ENABLED
         help
-            OpenCores Ethernet MAC driver can be used when an ESP-IDF application
-            is executed in QEMU. This driver is not supported when running on a
-            real chip.
+            当ESP-IDF应用程序在QEMU中执行时，可以使用OpenCores以太网MAC驱动程序。
+            在实际芯片上运行时不支持此驱动程序。
 
     if ETH_USE_OPENETH
         config ETH_OPENETH_DMA_RX_BUFFER_NUM
-            int "Number of Ethernet DMA Rx buffers"
+            int "以太网DMA接收缓冲区数量"
             range 1 64
             default 4
             help
-                Number of DMA receive buffers, each buffer is 1600 bytes.
+                DMA接收缓冲区的数量，每个缓冲区大小为1600字节。
 
         config ETH_OPENETH_DMA_TX_BUFFER_NUM
-            int "Number of Ethernet DMA Tx buffers"
+            int "以太网DMA发送缓冲区数量"
             range 1 64
             default 1
             help
-                Number of DMA transmit buffers, each buffer is 1600 bytes.
+                DMA发送缓冲区的数量，每个缓冲区大小为1600字节。
     endif # ETH_USE_OPENETH
 
     config ETH_TRANSMIT_MUTEX
         depends on ETH_ENABLED
-        bool "Enable Transmit Mutex"
+        bool "启用发送互斥锁"
         default n
         help
-            Prevents multiple accesses when Ethernet interface is used as shared resource and multiple
-            functionalities might try to access it at a time.
+            当以太网接口作为共享资源使用，并且多个功能可能同时尝试访问它时，
+            防止多次访问。
 endmenu

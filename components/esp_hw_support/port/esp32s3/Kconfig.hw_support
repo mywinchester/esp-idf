@@ -1,20 +1,20 @@
 choice ESP32S3_REV_MIN
-    prompt "Minimum Supported ESP32-S3 Revision"
+    prompt "最小支持的 ESP32-S3 版本"
     default ESP32S3_REV_MIN_0
     help
-        Required minimum chip revision. ESP-IDF will check for it and
-        reject to boot if the chip revision fails the check.
-        This ensures the chip used will have some modifications (features, or bugfixes).
+        所需的最小芯片版本。ESP-IDF 将对其进行检查，
+        如果芯片版本未通过检查，将拒绝启动。
+        这确保使用的芯片将具有一些修改（功能或错误修复）。
 
-        The complied binary will only support chips above this revision,
-        this will also help to reduce binary size.
+        编译的二进制文件将仅支持高于此版本的芯片，
+        这也将有助于减小二进制文件的大小。
 
     config ESP32S3_REV_MIN_0
-        bool "Rev v0.0 (ECO0)"
+        bool "版本 v0.0 (ECO0)"
     config ESP32S3_REV_MIN_1
-        bool "Rev v0.1 (ECO1)"
+        bool "版本 v0.1 (ECO1)"
     config ESP32S3_REV_MIN_2
-        bool "Rev v0.2 (ECO2)"
+        bool "版本 v0.2 (ECO2)"
 endchoice
 
 config ESP32S3_REV_MIN_FULL
@@ -31,7 +31,7 @@ config ESP_REV_MIN_FULL
     # MAX Revision
     #
 
-    comment "Maximum Supported ESP32-S3 Revision (Rev v0.99)"
+    comment "最大支持的 ESP32-S3 版本 (版本 v0.99)"
     # Maximum revision that IDF supports.
     # It can not be changed by user.
     # Only Espressif can change it when a new version will be supported in IDF.

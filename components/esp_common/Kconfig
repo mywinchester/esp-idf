@@ -1,13 +1,11 @@
-menu "Common ESP-related"
+menu "常见ESP相关"
 
     config ESP_ERR_TO_NAME_LOOKUP
-        bool "Enable lookup of error code strings"
+        bool "启用错误代码字符串查找"
         default "y"
         help
-            Functions esp_err_to_name() and esp_err_to_name_r() return string representations of error codes from a
-            pre-generated lookup table. This option can be used to turn off the use of the look-up table in order to
-            save memory but this comes at the price of sacrificing distinguishable (meaningful) output string
-            representations.
+            函数esp_err_to_name()和esp_err_to_name_r()从预生成的查找表中返回错误代码的字符串表示。
+            此选项可用于关闭查找表的使用，以节省内存，但代价是牺牲可区分（有意义）的输出字符串表示。
 
     config ESP_ALLOW_BSS_SEG_EXTERNAL_MEMORY
         # Invisible option that is set by SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY, but

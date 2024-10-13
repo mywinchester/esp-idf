@@ -1,28 +1,25 @@
-menu "ESP-Driver:USB Serial/JTAG Configuration"
+menu "ESP-驱动：USB 串口/JTAG 配置"
     depends on SOC_USB_SERIAL_JTAG_SUPPORTED
 
     config USJ_ENABLE_USB_SERIAL_JTAG
-        bool "Enable USB-Serial-JTAG Module"
+        bool "启用 USB-串口-JTAG 模块"
         default y
         help
-            The USB-Serial-JTAG module on ESP chips is turned on by default after power-on.
-            If your application does not need it and not rely on it to be used as system
-            console or use the built-in JTAG for debugging, you can disable this option,
-            then the clock of this module will be disabled at startup, which will save
-            some power consumption.
+            ESP芯片上的USB-串口-JTAG模块在上电后默认开启。
+            如果您的应用程序不需要它，也不依赖它作为系统控制台或使用内置JTAG进行调试，
+            您可以禁用此选项，然后在启动时将禁用此模块的时钟，这将节省一些功耗。
 
     config USJ_NO_AUTO_LS_ON_CONNECTION
-        bool "Don't enter the automatic light sleep when USB Serial/JTAG port is connected"
+        bool "当USB串口/JTAG端口连接时不自动进入浅睡眠模式"
         depends on PM_ENABLE && ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED && !SOC_USB_SERIAL_JTAG_SUPPORT_LIGHT_SLEEP \
             && USJ_ENABLE_USB_SERIAL_JTAG
         default n
         help
-            If enabled, the chip will constantly monitor the connection status of the USB Serial/JTAG port. As long
-            as the USB Serial/JTAG is connected, a ESP_PM_NO_LIGHT_SLEEP power management lock will be acquired to
-            prevent the system from entering light sleep.
-            This option can be useful if serial monitoring is needed via USB Serial/JTAG while power management is
-            enabled, as the USB Serial/JTAG cannot work under light sleep and after waking up from light sleep.
-            Note. This option can only control the automatic Light-Sleep behavior. If esp_light_sleep_start() is
-            called manually from the program, enabling this option will not prevent light sleep entry even if the
-            USB Serial/JTAG is in use.
+            如果启用，芯片将持续监控USB串口/JTAG端口的连接状态。只要USB串口/JTAG
+            处于连接状态，就会获取一个ESP_PM_NO_LIGHT_SLEEP电源管理锁，以防止系统
+            进入浅睡眠模式。
+            当启用电源管理且需要通过USB串口/JTAG进行串口监控时，此选项可能会很有用，
+            因为USB串口/JTAG在浅睡眠模式下无法工作，且从浅睡眠唤醒后也无法工作。
+            注意：此选项只能控制自动浅睡眠行为。如果在程序中手动调用esp_light_sleep_start()，
+            即使USB串口/JTAG正在使用，启用此选项也不会阻止进入浅睡眠模式。
 endmenu # USB Serial/JTAG Configuration

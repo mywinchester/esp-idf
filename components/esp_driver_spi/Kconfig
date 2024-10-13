@@ -1,26 +1,22 @@
-menu "ESP-Driver:SPI Configurations"
+menu "ESP-驱动：SPI 配置"
     depends on SOC_GPSPI_SUPPORTED
     config SPI_MASTER_IN_IRAM
-        bool "Place transmitting functions of SPI master into IRAM"
+        bool "将 SPI 主机的传输功能放入 IRAM"
         default n
         depends on !FREERTOS_PLACE_FUNCTIONS_INTO_FLASH
         select SPI_MASTER_ISR_IN_IRAM
         select ESP_SPI_BUS_LOCK_FUNCS_IN_IRAM
         help
-            Normally only the ISR of SPI master is placed in the IRAM, so that it
-            can work without the flash when interrupt is triggered.
-            For other functions, there's some possibility that the flash cache
-            miss when running inside and out of SPI functions, which may increase
-            the interval of SPI transactions.
-            Enable this to put ``queue_trans``, ``get_trans_result`` and
-            ``transmit`` functions into the IRAM to avoid possible cache miss.
+            通常只有 SPI 主机的 ISR 被放置在 IRAM 中，以便在触发中断时可以在没有闪存的情况下工作。
+            对于其他功能，在 SPI 功能内部和外部运行时可能会出现闪存缓存未命中的情况，这可能会增加 SPI 事务的间隔。
+            启用此选项可将 ``queue_trans``、``get_trans_result`` 和 ``transmit`` 函数放入 IRAM，以避免可能的缓存未命中。
 
-            This configuration won't be available if `CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH` is enabled.
+            如果启用了 `CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH`，则此配置将不可用。
 
-            During unit test, this is enabled to measure the ideal case of api.
+            在单元测试期间，启用此选项以测量 API 的理想情况。
 
     config SPI_MASTER_ISR_IN_IRAM
-        bool "Place SPI master ISR function into IRAM"
+        bool "将 SPI 主机 ISR 函数放入 IRAM"
         default y
         depends on !HEAP_PLACE_FUNCTION_INTO_FLASH
         select PERIPH_CTRL_FUNC_IN_IRAM
@@ -28,37 +24,29 @@ menu "ESP-Driver:SPI Configurations"
         select ESP_SPI_BUS_LOCK_ISR_FUNCS_IN_IRAM
         select GDMA_CTRL_FUNC_IN_IRAM if SOC_GDMA_SUPPORTED
         help
-            Place the SPI master ISR in to IRAM to avoid possible cache miss.
+            将 SPI 主机 ISR 放入 IRAM 以避免可能的缓存未命中。
 
-            Enabling this configuration is possible only when HEAP_PLACE_FUNCTION_INTO_FLASH
-            is disabled since the spi master uses can allocate transactions buffers into DMA
-            memory section using the heap component API that ipso facto has to be placed in IRAM.
+            只有在禁用 HEAP_PLACE_FUNCTION_INTO_FLASH 时才能启用此配置，因为 SPI 主机使用可以使用堆组件 API 将事务缓冲区分配到 DMA 内存部分，而该 API 必须放置在 IRAM 中。
 
-            Also you can forbid the ISR being disabled during flash writing
-            access, by add ESP_INTR_FLAG_IRAM when initializing the driver.
+            此外，您可以在初始化驱动程序时添加 ESP_INTR_FLAG_IRAM，以禁止在闪存写入访问期间禁用 ISR。
 
     config SPI_SLAVE_IN_IRAM
-        bool "Place transmitting functions of SPI slave into IRAM"
+        bool "将 SPI 从机的传输功能放入 IRAM"
         default n
         select SPI_SLAVE_ISR_IN_IRAM
         help
-            Normally only the ISR of SPI slave is placed in the IRAM, so that it
-            can work without the flash when interrupt is triggered.
-            For other functions, there's some possibility that the flash cache
-            miss when running inside and out of SPI functions, which may increase
-            the interval of SPI transactions.
-            Enable this to put ``queue_trans``, ``get_trans_result`` and
-            ``transmit`` functions into the IRAM to avoid possible cache miss.
+            通常只有 SPI 从机的 ISR 被放置在 IRAM 中，以便在触发中断时可以在没有闪存的情况下工作。
+            对于其他功能，在 SPI 功能内部和外部运行时可能会出现闪存缓存未命中的情况，这可能会增加 SPI 事务的间隔。
+            启用此选项可将 ``queue_trans``、``get_trans_result`` 和 ``transmit`` 函数放入 IRAM，以避免可能的缓存未命中。
 
     config SPI_SLAVE_ISR_IN_IRAM
-        bool "Place SPI slave ISR function into IRAM"
+        bool "将 SPI 从机 ISR 函数放入 IRAM"
         default y
         select PERIPH_CTRL_FUNC_IN_IRAM
         select HAL_SPI_SLAVE_FUNC_IN_IRAM
         help
-            Place the SPI slave ISR in to IRAM to avoid possible cache miss.
+            将 SPI 从机 ISR 放入 IRAM 以避免可能的缓存未命中。
 
-            Also you can forbid the ISR being disabled during flash writing
-            access, by add ESP_INTR_FLAG_IRAM when initializing the driver.
+            此外，您可以在初始化驱动程序时添加 ESP_INTR_FLAG_IRAM，以禁止在闪存写入访问期间禁用 ISR。
 
 endmenu # SPI Configuration

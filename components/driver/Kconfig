@@ -1,155 +1,152 @@
-menu "Driver Configurations"
+menu "驱动程序配置"
 
     orsource "./twai/Kconfig.twai"
 
-    menu "Legacy ADC Driver Configuration"
+    menu "传统 ADC 驱动程序配置"
 
         config ADC_DISABLE_DAC
             depends on SOC_DAC_SUPPORTED
-            bool "Disable DAC when ADC2 is used on GPIO 25 and 26"
+            bool "当 ADC2 在 GPIO 25 和 26 上使用时禁用 DAC"
             default y
             help
-                If this is set, the ADC2 driver will disable the output of the DAC corresponding to the specified
-                channel. This is the default value.
+                如果设置此项，ADC2 驱动程序将禁用与指定通道对应的 DAC 输出。这是默认值。
 
-                For testing, disable this option so that we can measure the output of DAC by internal ADC.
+                为了测试，禁用此选项，以便我们可以通过内部 ADC 测量 DAC 的输出。
 
         config ADC_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                Whether to suppress the deprecation warnings when using legacy adc driver (driver/adc.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 adc 驱动程序（driver/adc.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
 
-        menu "Legacy ADC Calibration Configuration"
+        menu "传统 ADC 校准配置"
 
             config ADC_CAL_EFUSE_TP_ENABLE
                 depends on IDF_TARGET_ESP32
-                bool "Use Two Point Values"
+                bool "使用两点值"
                 default "y"
                 help
-                    Some ESP32s have Two Point calibration values burned into eFuse BLOCK3.
-                    This option will allow the ADC calibration component to characterize the
-                    ADC-Voltage curve using Two Point values if they are available.
+                    一些 ESP32 在 eFuse BLOCK3 中烧录了两点校准值。
+                    如果可用，此选项将允许 ADC 校准组件使用两点值来表征
+                    ADC-电压曲线。
 
             config ADC_CAL_EFUSE_VREF_ENABLE
                 depends on IDF_TARGET_ESP32
-                bool "Use eFuse Vref"
+                bool "使用 eFuse Vref"
                 default "y"
                 help
-                    Some ESP32s have Vref burned into eFuse BLOCK0. This option will allow
-                    the ADC calibration component to characterize the ADC-Voltage curve using
-                    eFuse Vref if it is available.
+                    一些 ESP32 在 eFuse BLOCK0 中烧录了 Vref。如果可用，此选项将允许
+                    ADC 校准组件使用 eFuse Vref 来表征 ADC-电压曲线。
 
             config ADC_CAL_LUT_ENABLE
                 depends on IDF_TARGET_ESP32
-                bool "Use Lookup Tables"
+                bool "使用查找表"
                 default "y"
                 help
-                    This option will allow the ADC calibration component to use Lookup Tables
-                    to correct for non-linear behavior in 11db attenuation. Other attenuations
-                    do not exhibit non-linear behavior hence will not be affected by this option.
+                    此选项将允许 ADC 校准组件使用查找表
+                    来校正 11db 衰减中的非线性行为。其他衰减
+                    不表现出非线性行为，因此不会受此选项影响。
 
             config ADC_CALI_SUPPRESS_DEPRECATE_WARN
-                bool "Suppress legacy driver deprecated warning"
+                bool "抑制传统驱动程序弃用警告"
                 default n
                 help
-                    Whether to suppress the deprecation warnings when using legacy adc calibration
-                    driver (esp_adc_cal.h).
-                    If you want to continue using the legacy driver, and don't want to see related
-                    deprecation warnings, you can enable this option.
+                    是否在使用传统 adc 校准驱动程序（esp_adc_cal.h）时抑制弃用警告。
+                    如果您想继续使用传统驱动程序，并且不想看到相关的
+                    弃用警告，您可以启用此选项。
 
         endmenu # Legacy ADC Calibration Configuration
     endmenu  # Legacy ADC Driver Configuration
 
-    menu "Legacy DAC Driver Configurations"
+    menu "传统 DAC 驱动程序配置"
         depends on SOC_DAC_SUPPORTED
         config DAC_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                Whether to suppress the deprecation warnings when using legacy dac driver (driver/dac.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 dac 驱动程序（driver/dac.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy DAC Driver Configurations
 
-    menu "Legacy MCPWM Driver Configurations"
+    menu "传统 MCPWM 驱动程序配置"
         depends on SOC_MCPWM_SUPPORTED
         config MCPWM_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                Whether to suppress the deprecation warnings when using legacy MCPWM driver (driver/mcpwm.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 MCPWM 驱动程序（driver/mcpwm.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy MCPWM Driver Configurations
 
-    menu "Legacy Timer Group Driver Configurations"
+    menu "传统定时器组驱动程序配置"
         depends on SOC_GPTIMER_SUPPORTED
         config GPTIMER_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                Whether to suppress the deprecation warnings when using legacy timer group driver (driver/timer.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统定时器组驱动程序（driver/timer.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
 
     endmenu # Legacy Timer Group Driver Configurations
 
-    menu "Legacy RMT Driver Configurations"
+    menu "传统 RMT 驱动程序配置"
         depends on SOC_RMT_SUPPORTED
         config RMT_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                Whether to suppress the deprecation warnings when using legacy rmt driver (driver/rmt.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 rmt 驱动程序（driver/rmt.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy RMT Driver Configurations
 
-    menu "Legacy I2S Driver Configurations"
+    menu "传统 I2S 驱动程序配置"
         depends on SOC_I2S_SUPPORTED
         config I2S_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                Whether to suppress the deprecation warnings when using legacy i2s driver (driver/i2s.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 i2s 驱动程序（driver/i2s.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy I2S Driver Configurationss
 
-    menu "Legacy PCNT Driver Configurations"
+    menu "传统 PCNT 驱动程序配置"
         depends on SOC_PCNT_SUPPORTED
         config PCNT_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                whether to suppress the deprecation warnings when using legacy PCNT driver (driver/pcnt.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 PCNT 驱动程序（driver/pcnt.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy PCNT Driver Configurationss
 
-    menu "Legacy SDM Driver Configurations"
+    menu "传统 SDM 驱动程序配置"
         depends on SOC_SDM_SUPPORTED
         config SDM_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                whether to suppress the deprecation warnings when using legacy SDM driver (driver/sigmadelta.h).
-                If you want to continue using the legacy driver, and don't want to see related deprecation warnings,
-                you can enable this option.
+                是否在使用传统 SDM 驱动程序（driver/sigmadelta.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy SDM Driver Configurationss
 
-    menu "Legacy Temperature Sensor Driver Configurations"
+    menu "传统温度传感器驱动程序配置"
         depends on SOC_TEMP_SENSOR_SUPPORTED
         config TEMP_SENSOR_SUPPRESS_DEPRECATE_WARN
-            bool "Suppress legacy driver deprecated warning"
+            bool "抑制传统驱动程序弃用警告"
             default n
             help
-                whether to suppress the deprecation warnings when using legacy temperature sensor driver
-                (driver/temp_sensor.h). If you want to continue using the legacy driver,
-                and don't want to see related deprecation warnings, you can enable this option.
+                是否在使用传统温度传感器驱动程序（driver/temp_sensor.h）时抑制弃用警告。
+                如果您想继续使用传统驱动程序，并且不想看到相关的弃用警告，
+                您可以启用此选项。
     endmenu # Legacy Temperature Sensor Driver Configurationss
 
 endmenu  # Driver configurations

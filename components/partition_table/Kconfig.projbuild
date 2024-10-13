@@ -1,97 +1,83 @@
-menu "Partition Table"
+menu "分区表"
 
     choice PARTITION_TABLE_TYPE
-        prompt "Partition Table"
+        prompt "分区表"
         default PARTITION_TABLE_SINGLE_APP
         help
-            The partition table to flash to the ESP32. The partition table
-            determines where apps, data and other resources are expected to
-            be found.
+            要刷写到 ESP32 的分区表。分区表决定了应用程序、数据和其他资源预期存放的位置。
 
-            The predefined partition table CSV descriptions can be found
-            in the components/partition_table directory. These are mostly intended
-            for example and development use, it's expect that for production use you
-            will copy one of these CSV files and create a custom partition CSV for
-            your application.
+            预定义的分区表 CSV 描述可以在 components/partition_table 目录中找到。这些主要用于示例和开发用途，
+            预期在生产使用中，您将复制其中一个 CSV 文件并为您的应用程序创建自定义分区 CSV。
 
         config PARTITION_TABLE_SINGLE_APP
-            bool "Single factory app, no OTA"
+            bool "单一工厂应用程序，无 OTA"
             help
-                This is the default partition table, designed to fit into a 2MB or
-                larger flash with a single 1MB app partition.
+                这是默认的分区表，设计用于适合 2MB 或更大的闪存，带有单个 1MB 的应用程序分区。
 
-                The corresponding CSV file in the IDF directory is
-                components/partition_table/partitions_singleapp.csv
+                IDF 目录中对应的 CSV 文件是 components/partition_table/partitions_singleapp.csv
 
-                This partition table is not suitable for an app that needs OTA
-                (over the air update) capability.
+                这个分区表不适用于需要 OTA（空中更新）功能的应用程序。
+
         config PARTITION_TABLE_SINGLE_APP_LARGE
-            bool "Single factory app (large), no OTA"
+            bool "单一工厂应用程序（大型），无 OTA"
             help
-                This is a variation of the default partition table, that expands
-                the 1MB app partition size to 1.5MB to fit more code.
+                这是默认分区表的一个变体，将 1MB 的应用程序分区大小扩展到 1.5MB 以适应更多代码。
 
-                The corresponding CSV file in the IDF directory is
-                components/partition_table/partitions_singleapp_large.csv
+                IDF 目录中对应的 CSV 文件是 components/partition_table/partitions_singleapp_large.csv
 
-                This partition table is not suitable for an app that needs OTA
-                (over the air update) capability.
+                这个分区表不适用于需要 OTA（空中更新）功能的应用程序。
+
         config PARTITION_TABLE_TWO_OTA
-            bool "Factory app, two OTA definitions"
+            bool "工厂应用程序，两个 OTA 定义"
             help
-                This is a basic OTA-enabled partition table with a factory app
-                partition plus two OTA app partitions. All are 1MB, so this
-                partition table requires 4MB or larger flash size.
+                这是一个基本的支持 OTA 的分区表，包含一个工厂应用程序分区和两个 OTA 应用程序分区。
+                所有分区都是 1MB，因此这个分区表需要 4MB 或更大的闪存大小。
 
-                The corresponding CSV file in the IDF directory is
-                components/partition_table/partitions_two_ota.csv
+                IDF 目录中对应的 CSV 文件是 components/partition_table/partitions_two_ota.csv
+
         config PARTITION_TABLE_CUSTOM
-            bool "Custom partition table CSV"
+            bool "自定义分区表 CSV"
             help
-                Specify the path to the partition table CSV to use for your project.
+                指定用于您项目的分区表 CSV 的路径。
 
-                Consult the Partition Table section in the ESP-IDF Programmers Guide
-                for more information.
+                有关更多信息，请参阅 ESP-IDF 程序员指南中的分区表部分。
+
         config PARTITION_TABLE_SINGLE_APP_ENCRYPTED_NVS
-            bool "Single factory app, no OTA, encrypted NVS"
+            bool "单一工厂应用程序，无 OTA，加密的 NVS"
             depends on !ESP32_COREDUMP_ENABLE_TO_FLASH && NVS_SEC_KEY_PROTECT_USING_FLASH_ENC
 
             help
-                This is a variation of the default "Single factory app, no OTA" partition table
-                that supports encrypted NVS when using flash encryption. See the Flash Encryption section
-                in the ESP-IDF Programmers Guide for more information.
+                这是默认"单一工厂应用程序，无 OTA"分区表的一个变体，
+                在使用闪存加密时支持加密的 NVS。有关更多信息，请参阅 ESP-IDF 程序员指南中的闪存加密部分。
 
-                The corresponding CSV file in the IDF directory is
-                components/partition_table/partitions_singleapp_encr_nvs.csv
+                IDF 目录中对应的 CSV 文件是 components/partition_table/partitions_singleapp_encr_nvs.csv
+
         config PARTITION_TABLE_SINGLE_APP_LARGE_ENC_NVS
-            bool "Single factory app (large), no OTA, encrypted NVS"
+            bool "单一工厂应用程序（大型），无 OTA，加密的 NVS"
             depends on !ESP32_COREDUMP_ENABLE_TO_FLASH && NVS_SEC_KEY_PROTECT_USING_FLASH_ENC
             help
-                This is a variation of the "Single factory app (large), no OTA" partition table
-                that supports encrypted NVS when using flash encryption. See the Flash Encryption section
-                in the ESP-IDF Programmers Guide for more information.
+                这是"单一工厂应用程序（大型），无 OTA"分区表的一个变体，
+                在使用闪存加密时支持加密的 NVS。有关更多信息，请参阅 ESP-IDF 程序员指南中的闪存加密部分。
 
-                The corresponding CSV file in the IDF directory is
-                components/partition_table/partitions_singleapp_large_encr_nvs.csv
+                IDF 目录中对应的 CSV 文件是 components/partition_table/partitions_singleapp_large_encr_nvs.csv
+
         config PARTITION_TABLE_TWO_OTA_ENCRYPTED_NVS
-            bool "Factory app, two OTA definitions, encrypted NVS"
+            bool "工厂应用程序，两个 OTA 定义，加密的 NVS"
             depends on !ESP_COREDUMP_ENABLE_TO_FLASH && NVS_SEC_KEY_PROTECT_USING_FLASH_ENC
             help
-                This is a variation of the "Factory app, two OTA definitions" partition table
-                that supports encrypted NVS when using flash encryption. See the Flash Encryption section
-                in the ESP-IDF Programmers Guide for more information.
+                这是"工厂应用程序，两个 OTA 定义"分区表的一个变体，
+                在使用闪存加密时支持加密的 NVS。有关更多信息，请参阅 ESP-IDF 程序员指南中的闪存加密部分。
 
-                The corresponding CSV file in the IDF directory is
-                components/partition_table/partitions_two_ota_encr_nvs.csv
+                IDF 目录中对应的 CSV 文件是 components/partition_table/partitions_two_ota_encr_nvs.csv
     endchoice
 
     config PARTITION_TABLE_CUSTOM_FILENAME
-        string "Custom partition CSV file" if PARTITION_TABLE_CUSTOM
+        string "自定义分区 CSV 文件" if PARTITION_TABLE_CUSTOM
         default "partitions.csv"
         help
-            Name of the custom partition CSV filename.
-            This path is evaluated relative to the project root directory by default.
-            However, if the absolute path for the CSV file is provided, then the absolute path is configured.
+            自定义分区 CSV 文件的名称。
+            默认情况下，此路径相对于项目根目录进行评估。
+            但是，如果提供了 CSV 文件的绝对路径，则会配置绝对路径。
 
     config PARTITION_TABLE_FILENAME
         string
@@ -107,27 +93,24 @@ menu "Partition Table"
         default PARTITION_TABLE_CUSTOM_FILENAME if PARTITION_TABLE_CUSTOM
 
     config PARTITION_TABLE_OFFSET
-        hex "Offset of partition table"
+        hex "分区表偏移量"
         default 0x8000
         help
-            The address of partition table (by default 0x8000).
-            Allows you to move the partition table, it gives more space for the bootloader.
-            Note that the bootloader and app will both need to be compiled with the same PARTITION_TABLE_OFFSET value.
+            分区表的地址（默认为 0x8000）。
+            允许您移动分区表，为引导加载程序提供更多空间。
+            请注意，引导加载程序和应用程序都需要使用相同的 PARTITION_TABLE_OFFSET 值进行编译。
 
-            This number should be a multiple of 0x1000.
+            此数字应该是 0x1000 的倍数。
 
-            Note that partition offsets in the partition table CSV file may need to be changed if this value is set to
-            a higher value. To have each partition offset adapt to the configured partition table offset, leave all
-            partition offsets blank in the CSV file.
+            注意，如果将此值设置为更高的值，可能需要更改分区表 CSV 文件中的分区偏移量。
+            要使每个分区偏移量适应配置的分区表偏移量，请在 CSV 文件中将所有分区偏移量留空。
 
     config PARTITION_TABLE_MD5
-        bool "Generate an MD5 checksum for the partition table"
+        bool "为分区表生成 MD5 校验和"
         default y
         depends on !APP_COMPATIBLE_PRE_V3_1_BOOTLOADERS && !IDF_TARGET_LINUX
         help
-            Generate an MD5 checksum for the partition table for protecting the
-            integrity of the table. The generation should be turned off for legacy
-            bootloaders which cannot recognize the MD5 checksum in the partition
-            table.
+            为分区表生成 MD5 校验和，以保护表的完整性。对于无法识别分区表中 MD5 校验和的
+            旧版引导加载程序，应关闭生成。
 
 endmenu

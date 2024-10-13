@@ -1,37 +1,37 @@
 orsource "./$IDF_TARGET//Kconfig.soc_caps.in"
 
-menu "Boot ROM Behavior"
+menu "引导 ROM 行为"
     visible if !IDF_TARGET_ESP32  # no options ere currently supported on ESP32
 
     choice BOOT_ROM_LOG_SCHEME
-        prompt "Permanently change Boot ROM output"
+        prompt "永久更改引导 ROM 输出"
         default BOOT_ROM_LOG_ALWAYS_ON
         depends on !IDF_TARGET_ESP32
         help
-            Controls the Boot ROM log behavior.
-            The rom log behavior can only be changed for once,
-            specific eFuse bit(s) will be burned at app boot stage.
+            控制引导 ROM 日志行为。
+            ROM 日志行为只能更改一次，
+            特定的 eFuse 位将在应用程序引导阶段被烧录。
 
         config BOOT_ROM_LOG_ALWAYS_ON
-            bool "Always Log"
+            bool "始终记录日志"
             help
-                Always print ROM logs, this is the default behavior.
+                始终打印 ROM 日志，这是默认行为。
         config BOOT_ROM_LOG_ALWAYS_OFF
-            bool "Permanently disable logging"
+            bool "永久禁用日志记录"
             help
-                Don't print ROM logs.
+                不打印 ROM 日志。
         config BOOT_ROM_LOG_ON_GPIO_HIGH
-            bool "Log on GPIO High"
+            bool "在 GPIO 高电平时记录日志"
             help
-                Print ROM logs when GPIO level is high during start up.
-                The GPIO number is chip dependent,
-                e.g. on ESP32-S2, the control GPIO is GPIO46.
+                在启动期间 GPIO 电平为高时打印 ROM 日志。
+                GPIO 编号取决于芯片，
+                例如，在 ESP32-S2 上，控制 GPIO 是 GPIO46。
         config BOOT_ROM_LOG_ON_GPIO_LOW
-            bool "Log on GPIO Low"
+            bool "在 GPIO 低电平时记录日志"
             help
-                Print ROM logs when GPIO level is low during start up.
-                The GPIO number is chip dependent,
-                e.g. on ESP32-S2, the control GPIO is GPIO46.
+                在启动期间 GPIO 电平为低时打印 ROM 日志。
+                GPIO 编号取决于芯片，
+                例如，在 ESP32-S2 上，控制 GPIO 是 GPIO46。
     endchoice
 
 endmenu  # Boot ROM Behavior

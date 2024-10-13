@@ -1,31 +1,31 @@
-menu "ESP-Driver:GPTimer Configurations"
+menu "ESP-驱动：GPTimer 配置"
     depends on SOC_GPTIMER_SUPPORTED
     config GPTIMER_ISR_HANDLER_IN_IRAM
-        bool "Place GPTimer ISR handler into IRAM"
+        bool "将 GPTimer ISR 处理程序放入 IRAM"
         default y
         help
-            Place GPTimer ISR handler into IRAM for better performance and fewer cache misses.
+            将 GPTimer ISR 处理程序放入 IRAM 以获得更好的性能和更少的缓存未命中。
 
     config GPTIMER_CTRL_FUNC_IN_IRAM
-        bool "Place GPTimer control functions into IRAM"
+        bool "将 GPTimer 控制函数放入 IRAM"
         default n
         help
-            Place GPTimer control functions (like start/stop) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
-            Enabling this option can improve driver performance as well.
+            将 GPTimer 控制函数（如启动/停止）放入 IRAM，
+            以便这些函数可以在 IRAM 中安全运行，并能够在其他 IRAM 中断上下文中被调用。
+            启用此选项还可以提高驱动程序的性能。
 
     config GPTIMER_ISR_IRAM_SAFE
-        bool "GPTimer ISR IRAM-Safe"
+        bool "GPTimer ISR IRAM 安全"
         select GPTIMER_ISR_HANDLER_IN_IRAM
         default n
         help
-            Ensure the GPTimer interrupt is IRAM-Safe by allowing the interrupt handler to be
-            executable when the cache is disabled (e.g. SPI Flash write).
+            通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+            确保 GPTimer 中断是 IRAM 安全的。
 
     config GPTIMER_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            whether to enable the debug log message for GPTimer driver.
-            Note that, this option only controls the GPTimer driver log, won't affect other drivers.
+            是否为 GPTimer 驱动程序启用调试日志消息。
+            注意，此选项仅控制 GPTimer 驱动程序日志，不会影响其他驱动程序。
 endmenu

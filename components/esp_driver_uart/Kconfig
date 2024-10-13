@@ -1,12 +1,12 @@
-menu "ESP-Driver:UART Configurations"
+menu "ESP-驱动：UART 配置"
 
     config UART_ISR_IN_IRAM
-        bool "Place UART ISR function into IRAM"
+        bool "将 UART ISR 函数放入 IRAM"
         depends on !RINGBUF_PLACE_ISR_FUNCTIONS_INTO_FLASH
         select VFS_SELECT_IN_RAM if VFS_SUPPORT_SELECT
         default n
         help
-            If this option is not selected, UART interrupt will be disabled for a long time and
-            may cause data lost when doing spi flash operation.
+            如果未选择此选项，UART 中断将被禁用很长时间，
+            并可能在执行 SPI 闪存操作时导致数据丢失。
 
 endmenu

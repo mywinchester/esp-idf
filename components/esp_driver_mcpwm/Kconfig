@@ -1,25 +1,25 @@
-menu "ESP-Driver:MCPWM Configurations"
+menu "ESP-驱动：MCPWM 配置"
     depends on SOC_MCPWM_SUPPORTED
     config MCPWM_ISR_IRAM_SAFE
-        bool "Place MCPWM ISR function into IRAM"
+        bool "将 MCPWM ISR 函数放入 IRAM"
         default n
         help
-            This will ensure the MCPWM interrupt handle is IRAM-Safe, allow to avoid flash
-            cache misses, and also be able to run whilst the cache is disabled.
-            (e.g. SPI Flash write)
+            这将确保 MCPWM 中断处理程序是 IRAM 安全的，允许避免闪存
+            缓存未命中，并且还能够在缓存禁用时运行。
+            （例如，SPI 闪存写入）
 
     config MCPWM_CTRL_FUNC_IN_IRAM
-        bool "Place MCPWM control functions into IRAM"
+        bool "将 MCPWM 控制函数放入 IRAM"
         default n
         help
-            Place MCPWM control functions (like set_compare_value) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
-            Enabling this option can improve driver performance as well.
+            将 MCPWM 控制函数（如 set_compare_value）放入 IRAM，
+            以便这些函数可以是 IRAM 安全的，并能够在其他 IRAM 中断上下文中被调用。
+            启用此选项还可以提高驱动程序性能。
 
     config MCPWM_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            whether to enable the debug log message for MCPWM driver.
-            Note that, this option only controls the MCPWM driver log, won't affect other drivers.
+            是否为 MCPWM 驱动程序启用调试日志消息。
+            注意，此选项仅控制 MCPWM 驱动程序日志，不会影响其他驱动程序。
 endmenu

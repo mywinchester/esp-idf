@@ -1,4 +1,4 @@
-menu "GDB Stub"
+menu "GDB 调试桩"
 
     # Hidden option which adds GDBStub on panic option to the "Panic handler behavior"
     # menu in the target component.
@@ -7,31 +7,31 @@ menu "GDB Stub"
         default y
 
     config ESP_SYSTEM_GDBSTUB_RUNTIME
-        bool "GDBStub at runtime"
+        bool "运行时 GDBStub"
         select ESP_GDBSTUB_ENABLED
         help
-            Enable builtin GDBStub.
-            This allows to debug the target device using serial port:
-            - Run 'idf.py monitor'.
-            - Wait for the device to initialize.
-            - Press Ctrl+C to interrupt the execution and enter GDB attached to your device for debugging.
-            NOTE: all UART input will be handled by GDBStub.
+            启用内置 GDBStub。
+            这允许使用串口调试目标设备：
+            - 运行 'idf.py monitor'。
+            - 等待设备初始化。
+            - 按 Ctrl+C 中断执行并进入 GDB，连接到您的设备进行调试。
+            注意：所有 UART 输入将由 GDBStub 处理。
 
     config ESP_GDBSTUB_SUPPORT_TASKS
-        bool "Enable listing FreeRTOS tasks through GDB Stub"
+        bool "通过 GDB Stub 启用列出 FreeRTOS 任务"
         depends on ESP_GDBSTUB_ENABLED
         default y
         help
-            If enabled, GDBStub can supply the list of FreeRTOS tasks to GDB.
-            Thread list can be queried from GDB using 'info threads' command.
-            Note that if GDB task lists were corrupted, this feature may not work.
-            If GDBStub fails, try disabling this feature.
+            如果启用，GDBStub 可以向 GDB 提供 FreeRTOS 任务列表。
+            可以使用 'info threads' 命令从 GDB 查询线程列表。
+            注意，如果 GDB 任务列表被损坏，此功能可能无法工作。
+            如果 GDBStub 失败，请尝试禁用此功能。
 
     config ESP_GDBSTUB_MAX_TASKS
-        int "Maximum number of tasks supported by GDB Stub"
+        int "GDB Stub 支持的最大任务数"
         default 32
         depends on ESP_GDBSTUB_SUPPORT_TASKS
         help
-            Set the number of tasks which GDB Stub will support.
+            设置 GDB Stub 将支持的任务数量。
 
 endmenu

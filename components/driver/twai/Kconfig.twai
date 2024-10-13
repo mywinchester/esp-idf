@@ -1,71 +1,72 @@
-menu "TWAI Configuration"
+menu "TWAI 配置"
     depends on SOC_TWAI_SUPPORTED
 
     config TWAI_ISR_IN_IRAM
-        bool "Place TWAI ISR function into IRAM"
+        bool "将 TWAI ISR 函数放入 IRAM"
         default n
         help
-            Place the TWAI ISR in to IRAM. This will allow the ISR to avoid
-            cache misses, and also be able to run whilst the cache is disabled
-            (such as when writing to SPI Flash).
-            Note that if this option is enabled:
-            - Users should also set the ESP_INTR_FLAG_IRAM in the driver
-            configuration structure when installing the driver (see docs for
-            specifics).
-            - Alert logging (i.e., setting of the TWAI_ALERT_AND_LOG flag)
-            will have no effect.
+            将 TWAI ISR 放入 IRAM。这将允许 ISR 避免缓存未命中，
+            并且在缓存禁用时也能运行（例如写入 SPI Flash 时）。
+            请注意，如果启用此选项：
+            - 用户在安装驱动程序时还应在驱动程序配置结构中设置
+              ESP_INTR_FLAG_IRAM（具体请参阅文档）。
+            - 警报日志记录（即设置 TWAI_ALERT_AND_LOG 标志）将
+              不起作用。
 
     config TWAI_ERRATA_FIX_BUS_OFF_REC
-        bool "Add SW workaround for REC change during bus-off"
+        bool "为总线关闭期间的 REC 变化添加软件解决方案"
         depends on IDF_TARGET_ESP32
         default y
         help
-            When the bus-off condition is reached, the REC should be reset to 0 and frozen (via LOM) by the
-            driver's ISR. However on the ESP32, there is an edge case where the REC will increase before the
-            driver's ISR can respond in time (e.g., due to the rapid occurrence of bus errors), thus causing the
-            REC to be non-zero after bus-off. A non-zero REC can prevent bus-off recovery as the bus-off recovery
-            condition is that both TEC and REC become 0. Enabling this option will add a workaround in the driver
-            to forcibly reset REC to zero on reaching bus-off.
+            当达到总线关闭条件时，REC 应该被驱动程序的 ISR 重置为 0
+            并冻结（通过 LOM）。然而在 ESP32 上，存在一种边缘情况，
+            即 REC 会在驱动程序的 ISR 来不及响应时增加（例如，由于
+            总线错误的快速发生），从而导致总线关闭后 REC 不为零。
+            非零 REC 可能会阻止总线关闭恢复，因为总线关闭恢复的条件
+            是 TEC 和 REC 都变为 0。启用此选项将在驱动程序中添加一个
+            解决方案，在达到总线关闭时强制将 REC 重置为零。
 
     config TWAI_ERRATA_FIX_TX_INTR_LOST
-        bool "Add SW workaround for TX interrupt lost errata"
+        bool "为 TX 中断丢失勘误添加软件解决方案"
         depends on IDF_TARGET_ESP32
         default y
         help
-            On the ESP32, when a transmit interrupt occurs, and interrupt register is read on the same APB clock
-            cycle, the transmit interrupt could be lost. Enabling this option will add a workaround that checks the
-            transmit buffer status bit to recover any lost transmit interrupt.
+            在 ESP32 上，当发生发送中断，并且在同一 APB 时钟周期内
+            读取中断寄存器时，发送中断可能会丢失。启用此选项将添加
+            一个解决方案，通过检查发送缓冲区状态位来恢复任何丢失的
+            发送中断。
 
     config TWAI_ERRATA_FIX_RX_FRAME_INVALID
-        bool "Add SW workaround for invalid RX frame errata"
+        bool "为无效 RX 帧勘误添加软件解决方案"
         depends on IDF_TARGET_ESP32
         default y
         help
-            On the ESP32, when receiving a data or remote frame, if a bus error occurs in the data or CRC field,
-            the data of the next received frame could be invalid. Enabling this option will add a workaround that
-            will reset the peripheral on detection of this errata condition. Note that if a frame is transmitted on
-            the bus whilst the reset is ongoing, the message will not be receive by the peripheral sent on the bus
-            during the reset, the message will be lost.
+            在 ESP32 上，当接收数据或远程帧时，如果在数据或 CRC 字段
+            发生总线错误，下一个接收帧的数据可能无效。启用此选项将
+            添加一个解决方案，在检测到这种勘误条件时重置外设。请注意，
+            如果在重置过程中在总线上发送了一个帧，该消息将不会被外设
+            接收，在重置期间发送到总线上的消息将丢失。
 
     config TWAI_ERRATA_FIX_RX_FIFO_CORRUPT
-        bool "Add SW workaround for RX FIFO corruption errata"
+        bool "为 RX FIFO 损坏勘误添加软件解决方案"
         depends on IDF_TARGET_ESP32
         default y
         help
-            On the ESP32, when the RX FIFO overruns and the RX message counter maxes out at 64 messages, the entire
-            RX FIFO is no longer recoverable. Enabling this option will add a workaround that resets the peripheral
-            on detection of this errata condition. Note that if a frame is being sent on the bus during the reset
-            bus during the reset, the message will be lost.
+            在 ESP32 上，当 RX FIFO 溢出且 RX 消息计数器达到最大值
+            64 条消息时，整个 RX FIFO 将无法恢复。启用此选项将添加
+            一个解决方案，在检测到这种勘误条件时重置外设。请注意，
+            如果在重置期间在总线上发送了一个帧，该消息将丢失。
 
     config TWAI_ERRATA_FIX_LISTEN_ONLY_DOM
-        bool "Add SW workaround for listen only transmits dominant bit errata"
+        bool "为仅监听模式发送显性位勘误添加软件解决方案"
         depends on IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C3
         default y
         help
-            When in the listen only mode, the TWAI controller must not influence the TWAI bus (i.e., must not send
-            any dominant bits). However, while in listen only mode on the ESP32/ESP32-S2/ESP32-S3/ESP32-C3, the
-            TWAI controller will still transmit dominant bits when it detects an error (i.e., as part of an active
-            error frame). Enabling this option will add a workaround that forces the TWAI controller into an error
-            passive state on initialization, thus preventing any dominant bits from being sent.
+            在仅监听模式下，TWAI 控制器不得影响 TWAI 总线（即不得
+            发送任何显性位）。然而，在 ESP32/ESP32-S2/ESP32-S3/ESP32-C3
+            的仅监听模式下，TWAI 控制器在检测到错误时仍会发送显性位
+            （即作为主动错误帧的一部分）。启用此选项将添加一个解决
+            方案，在初始化时强制 TWAI 控制器进入错误被动状态，从而
+            防止发送任何显性位。
 
 endmenu # TWAI Configuration

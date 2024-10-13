@@ -1,19 +1,19 @@
-menu "ESP-Driver:Temperature Sensor Configurations"
+menu "ESP-驱动：温度传感器配置"
     depends on SOC_TEMP_SENSOR_SUPPORTED
 
     config TEMP_SENSOR_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            whether to enable the debug log message for temperature sensor driver.
-            Note that, this option only controls the temperature sensor driver log, won't affect other drivers.
+            是否为温度传感器驱动启用调试日志消息。
+            注意，此选项仅控制温度传感器驱动的日志，不会影响其他驱动。
 
     config TEMP_SENSOR_ISR_IRAM_SAFE
         depends on SOC_TEMPERATURE_SENSOR_INTR_SUPPORT
-        bool "Temperature sensor ISR IRAM-Safe"
+        bool "温度传感器 ISR IRAM 安全"
         default n
         help
-            Ensure the Temperature Sensor interrupt is IRAM-Safe by allowing the interrupt handler to be
-            executable when the cache is disabled (e.g. SPI Flash write).
+            通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+            确保温度传感器中断是 IRAM 安全的。
 
 endmenu # TEMP_SENSOR Configuration

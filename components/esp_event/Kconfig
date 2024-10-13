@@ -1,25 +1,25 @@
-menu "Event Loop Library"
+menu "事件循环库"
 
     config ESP_EVENT_LOOP_PROFILING
-        bool "Enable event loop profiling"
+        bool "启用事件循环分析"
         default n
         help
-            Enables collections of statistics in the event loop library such as the number of events posted
-            to/recieved by an event loop, number of callbacks involved, number of events dropped to to a full event
-            loop queue, run time of event handlers, and number of times/run time of each event handler.
+            在事件循环库中启用统计信息的收集，例如发布到/被事件循环接收的事件数量、涉及的回调数量、
+            由于事件循环队列已满而丢弃的事件数量、事件处理程序的运行时间，以及每个事件处理程序的
+            运行次数/运行时间。
 
     config ESP_EVENT_POST_FROM_ISR
-        bool "Support posting events from ISRs"
+        bool "支持从中断服务程序（ISR）发布事件"
         default y
         help
-            Enable posting events from interrupt handlers.
+            启用从中断处理程序发布事件。
 
     config ESP_EVENT_POST_FROM_IRAM_ISR
-        bool "Support posting events from ISRs placed in IRAM"
+        bool "支持从放置在IRAM中的中断服务程序（ISR）发布事件"
         default y
         depends on ESP_EVENT_POST_FROM_ISR
         help
-            Enable posting events from interrupt handlers placed in IRAM. Enabling this option places API functions
-            esp_event_post and esp_event_post_to in IRAM.
+            启用从放置在IRAM中的中断处理程序发布事件。启用此选项会将API函数esp_event_post和
+            esp_event_post_to放置在IRAM中。
 
 endmenu

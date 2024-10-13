@@ -1,88 +1,83 @@
-menu "ADC and ADC Calibration"
+menu "ADC和ADC校准"
 
     config ADC_ONESHOT_CTRL_FUNC_IN_IRAM
-        bool "Place ISR version ADC oneshot mode read function into IRAM"
+        bool "将ISR版本的ADC单次模式读取函数放入IRAM"
         default n
         help
-            Place ISR version ADC oneshot mode read function into IRAM.
+            将ISR版本的ADC单次模式读取函数放入IRAM。
 
     config ADC_CONTINUOUS_ISR_IRAM_SAFE
         depends on SOC_ADC_DMA_SUPPORTED
-        bool "ADC continuous mode driver ISR IRAM-Safe"
+        bool "ADC连续模式驱动程序ISR IRAM安全"
         default n
         select GDMA_ISR_IRAM_SAFE if SOC_ADC_DMA_SUPPORTED && SOC_GDMA_SUPPORTED
         help
-            Ensure the ADC continuous mode ISR is IRAM-Safe. When enabled, the ISR handler
-            will be available when the cache is disabled.
+            确保ADC连续模式ISR是IRAM安全的。启用后，当缓存被禁用时，ISR处理程序将可用。
 
-    menu "ADC Calibration Configurations"
+    menu "ADC校准配置"
         depends on IDF_TARGET_ESP32
 
         config ADC_CALI_EFUSE_TP_ENABLE
-            bool "Use Two Point Values"
+            bool "使用两点值"
             default "y"
             help
-                Some ESP32s have Two Point calibration values burned into eFuse BLOCK3.
-                This option will allow the ADC calibration component to characterize the
-                ADC-Voltage curve using Two Point values if they are available.
+                一些ESP32在eFuse BLOCK3中烧录了两点校准值。
+                如果可用，此选项将允许ADC校准组件使用两点值来表征ADC-电压曲线。
 
         config ADC_CALI_EFUSE_VREF_ENABLE
-            bool "Use eFuse Vref"
+            bool "使用eFuse Vref"
             default "y"
             help
-                Some ESP32s have Vref burned into eFuse BLOCK0. This option will allow
-                the ADC calibration component to characterize the ADC-Voltage curve using
-                eFuse Vref if it is available.
+                一些ESP32在eFuse BLOCK0中烧录了Vref。如果可用，此选项将允许
+                ADC校准组件使用eFuse Vref来表征ADC-电压曲线。
 
         config ADC_CALI_LUT_ENABLE
-            bool "Use Lookup Tables"
+            bool "使用查找表"
             default "y"
             help
-                This option will allow the ADC calibration component to use Lookup Tables
-                to correct for non-linear behavior in 11db attenuation. Other attenuations
-                do not exhibit non-linear behavior hence will not be affected by this option.
+                此选项将允许ADC校准组件使用查找表来校正11db衰减下的非线性行为。
+                其他衰减不表现出非线性行为，因此不会受此选项影响。
     endmenu
 
     config ADC_DISABLE_DAC_OUTPUT
         depends on SOC_DAC_SUPPORTED
-        bool "Disable DAC when ADC2 is in use"
+        bool "当ADC2使用时禁用DAC"
         default y
         help
-            By default, this is set. The ADC oneshot driver will disable the output of the
-            corresponding DAC channels:
-            ESP32:   IO25 and IO26
-            ESP32S2: IO17 and IO18
+            默认情况下，此选项被设置。ADC单次驱动程序将禁用相应DAC通道的输出：
+            ESP32：IO25和IO26
+            ESP32S2：IO17和IO18
 
-            Disable this option so as to measure the output of DAC by internal ADC, for test usage.
+            禁用此选项以便通过内部ADC测量DAC的输出，用于测试目的。
 
     config ADC_CONTINUOUS_FORCE_USE_ADC2_ON_C3_S3
         depends on IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32S3
-        bool "Force use ADC2 continumous mode on ESP32S3 or ESP32C3"
+        bool "在ESP32S3或ESP32C3上强制使用ADC2连续模式"
         default n
         help
-            On ESP32C3 and ESP32S3, ADC2 Digital Controller is not stable. Therefore,
-            ADC2 continuous mode is not suggested on ESP32S3 and ESP32C3
+            在ESP32C3和ESP32S3上，ADC2数字控制器不稳定。因此，
+            不建议在ESP32S3和ESP32C3上使用ADC2连续模式。
 
-            If you stick to this, you can enable this option to force use ADC2 under above conditions.
-            For more details, you can search for errata on espressif website.
+            如果您坚持使用，可以启用此选项以在上述条件下强制使用ADC2。
+            有关更多详细信息，您可以在乐鑫网站上搜索勘误表。
 
     config ADC_ONESHOT_FORCE_USE_ADC2_ON_C3
         depends on IDF_TARGET_ESP32C3
-        bool "Force use ADC2 oneshot mode on ESP32C3"
+        bool "在ESP32C3上强制使用ADC2单次模式"
         default n
         help
-            On ESP32C3, ADC2 Digital Controller is not stable. Therefore,
-            ADC2 oneshot mode is not suggested on ESP32C3
+            在ESP32C3上，ADC2数字控制器不稳定。因此，
+            不建议在ESP32C3上使用ADC2单次模式。
 
-            If you stick to this, you can enable this option to force use ADC2 under above conditions.
-            For more details, you can search for errata on espressif website.
+            如果您坚持使用，可以启用此选项以在上述条件下强制使用ADC2。
+            有关更多详细信息，您可以在乐鑫网站上搜索勘误表。
 
     config ADC_ENABLE_DEBUG_LOG
-        bool "Enable ADC debug log"
+        bool "启用ADC调试日志"
         default n
         help
-            whether to enable the debug log message for ADC driver.
-            Note that this option only controls the ADC driver log, will not affect other drivers.
+            是否为ADC驱动程序启用调试日志消息。
+            请注意，此选项仅控制ADC驱动程序日志，不会影响其他驱动程序。
 
-            note: This cannot be used in the ADC legacy driver.
+            注意：这不能在ADC遗留驱动程序中使用。
 endmenu

@@ -1,84 +1,84 @@
-menu "GDMA Configurations"
+menu "GDMA 配置"
     depends on SOC_GDMA_SUPPORTED
     config GDMA_CTRL_FUNC_IN_IRAM
-        bool "Place GDMA control functions in IRAM"
+        bool "将 GDMA 控制函数放置在 IRAM 中"
         default n
         help
-            Place GDMA control functions (like start/stop/append/reset) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
+            将 GDMA 控制函数（如启动/停止/追加/重置）放置在 IRAM 中，
+            以便这些函数可以在 IRAM 中安全运行，并能够在其他 IRAM 中断上下文中被调用。
 
     config GDMA_ISR_IRAM_SAFE
-        bool "GDMA ISR IRAM-Safe"
+        bool "GDMA ISR IRAM 安全"
         default n
         help
-            This will ensure the GDMA interrupt handler is IRAM-Safe, allow to avoid flash
-            cache misses, and also be able to run whilst the cache is disabled.
-            (e.g. SPI Flash write).
+            这将确保 GDMA 中断处理程序是 IRAM 安全的，允许避免闪存
+            缓存未命中，并且还能够在缓存禁用时运行。
+            （例如 SPI 闪存写入）。
 
     config GDMA_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            Whether to enable the debug log message for GDMA driver.
-            Note that, this option only controls the GDMA driver log, won't affect other drivers.
+            是否为 GDMA 驱动程序启用调试日志消息。
+            注意，此选项仅控制 GDMA 驱动程序日志，不会影响其他驱动程序。
 endmenu # GDMA Configurations
 
-menu "DW_GDMA Configurations"
+menu "DW_GDMA 配置"
     depends on SOC_DW_GDMA_SUPPORTED
 
     config DW_GDMA_CTRL_FUNC_IN_IRAM
-        bool
+        bool "将 DW_GDMA 控制函数放置在 IRAM 中"
         default n
         help
-            Place DW_GDMA control functions (e.g. dw_gdma_channel_continue) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
+            将 DW_GDMA 控制函数（例如 dw_gdma_channel_continue）放置在 IRAM 中，
+            以便这些函数可以在 IRAM 中安全运行，并能够在其他 IRAM 中断上下文中被调用。
 
     config DW_GDMA_SETTER_FUNC_IN_IRAM
-        bool
+        bool "将 DW_GDMA 设置函数放置在 IRAM 中"
         default n
         help
-            Place DW_GDMA setter functions (e.g. dw_gdma_channel_set_block_markers) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
+            将 DW_GDMA 设置函数（例如 dw_gdma_channel_set_block_markers）放置在 IRAM 中，
+            以便这些函数可以在 IRAM 中安全运行，并能够在其他 IRAM 中断上下文中被调用。
 
     config DW_GDMA_GETTER_FUNC_IN_IRAM
-        bool
+        bool "将 DW_GDMA 获取函数放置在 IRAM 中"
         default n
         help
-            Place DW_GDMA getter functions (e.g. dw_gdma_link_list_get_item) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
+            将 DW_GDMA 获取函数（例如 dw_gdma_link_list_get_item）放置在 IRAM 中，
+            以便这些函数可以在 IRAM 中安全运行，并能够在其他 IRAM 中断上下文中被调用。
 
     config DW_GDMA_ISR_IRAM_SAFE
-        bool
+        bool "DW_GDMA ISR IRAM 安全"
         default n
         help
-            This will ensure the DW_GDMA interrupt handler is IRAM-Safe, allow to avoid flash
-            cache misses, and also be able to run whilst the cache is disabled.
-            (e.g. SPI Flash write).
+            这将确保 DW_GDMA 中断处理程序是 IRAM 安全的，允许避免闪存
+            缓存未命中，并且还能够在缓存禁用时运行。
+            （例如 SPI 闪存写入）。
 
     config DW_GDMA_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            Whether to enable the debug log message for DW_GDMA driver.
-            Note that, this option only controls the DW_GDMA driver log, won't affect other drivers.
+            是否为 DW_GDMA 驱动程序启用调试日志消息。
+            注意，此选项仅控制 DW_GDMA 驱动程序日志，不会影响其他驱动程序。
 endmenu # DW_GDMA Configurations
 
-menu "2D-DMA Configurations"
+menu "2D-DMA 配置"
     depends on SOC_DMA2D_SUPPORTED
 
     config DMA2D_OPERATION_FUNC_IN_IRAM
-        bool "Place 2D-DMA operation functions into IRAM"
+        bool "将 2D-DMA 操作函数放置在 IRAM 中"
         default n
         help
-            Place 2D-DMA all operation functions, including control functions (e.g. start/stop/append/reset) and setter
-            functions (e.g. connect/strategy/callback registration) into IRAM, so that these functions can be IRAM-safe
-            and able to be called in the other IRAM interrupt context. It also helps optimizing the performance.
+            将 2D-DMA 所有操作函数，包括控制函数（例如启动/停止/追加/重置）和设置
+            函数（例如连接/策略/回调注册）放置在 IRAM 中，以便这些函数可以在 IRAM 中安全
+            运行，并能够在其他 IRAM 中断上下文中被调用。这也有助于优化性能。
 
     config DMA2D_ISR_IRAM_SAFE
-        bool "2D-DMA ISR IRAM-Safe"
+        bool "2D-DMA ISR IRAM 安全"
         default n
         help
-            This will ensure the 2D-DMA interrupt handler is IRAM-Safe, allow to avoid flash
-            cache misses, and also be able to run whilst the cache is disabled.
-            (e.g. SPI Flash write).
+            这将确保 2D-DMA 中断处理程序是 IRAM 安全的，允许避免闪存
+            缓存未命中，并且还能够在缓存禁用时运行。
+            （例如 SPI 闪存写入）。
 endmenu # 2D-DMA Configurations

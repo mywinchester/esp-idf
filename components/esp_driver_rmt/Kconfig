@@ -1,27 +1,27 @@
-menu "ESP-Driver:RMT Configurations"
+menu "ESP-驱动：RMT 配置"
     depends on SOC_RMT_SUPPORTED
     config RMT_ISR_IRAM_SAFE
-        bool "RMT ISR IRAM-Safe"
+        bool "RMT ISR IRAM 安全"
         default n
         select GDMA_ISR_IRAM_SAFE if SOC_RMT_SUPPORT_DMA     # RMT basic functionality relies on GDMA callback
         select GDMA_CTRL_FUNC_IN_IRAM if SOC_RMT_SUPPORT_DMA # RMT needs to restart the GDMA in the interrupt
         help
-            Ensure the RMT interrupt is IRAM-Safe by allowing the interrupt handler to be
-            executable when the cache is disabled (e.g. SPI Flash write).
+            通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+            确保 RMT 中断是 IRAM 安全的。
 
     config RMT_RECV_FUNC_IN_IRAM
-        bool "Place RMT receive function into IRAM"
+        bool "将 RMT 接收函数放入 IRAM"
         default n
         select GDMA_CTRL_FUNC_IN_IRAM if SOC_RMT_SUPPORT_DMA # RMT needs to start the GDMA in the receive function
         help
-            Place RMT receive function into IRAM,
-            so that the receive function can be IRAM-safe and able to be called when the flash cache is disabled.
-            Enabling this option can improve driver performance as well.
+            将 RMT 接收函数放入 IRAM，
+            使接收函数可以 IRAM 安全，并且在 flash 缓存禁用时可以被调用。
+            启用此选项还可以提高驱动程序性能。
 
     config RMT_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            whether to enable the debug log message for RMT driver.
-            Note that, this option only controls the RMT driver log, won't affect other drivers.
+            是否为 RMT 驱动程序启用调试日志消息。
+            注意，此选项仅控制 RMT 驱动程序日志，不会影响其他驱动程序。
 endmenu

@@ -1,9 +1,9 @@
-menu "ESP HTTPS server"
+menu "ESP HTTPS 服务器"
 
     config ESP_HTTPS_SERVER_ENABLE
-        bool "Enable ESP_HTTPS_SERVER component"
+        bool "启用 ESP_HTTPS_SERVER 组件"
         depends on (ESP_TLS_USING_MBEDTLS && MBEDTLS_TLS_SERVER)
         help
-            Enable ESP HTTPS server component
+            启用 ESP HTTPS 服务器组件
 
 endmenu

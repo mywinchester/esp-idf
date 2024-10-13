@@ -1,25 +1,25 @@
-menu "ESP-Driver:Touch Sensor Configurations"
+menu "ESP-驱动：触摸传感器配置"
     depends on SOC_TOUCH_SENSOR_SUPPORTED
     config TOUCH_CTRL_FUNC_IN_IRAM
-        bool "Place touch sensor control functions into IRAM"
+        bool "将触摸传感器控制函数放入 IRAM"
         default n
         help
-            Place touch sensor oneshot scanning and continuous scanning functions into IRAM,
-            so that these function can be IRAM-safe and able to be called when the flash cache is disabled.
-            Enabling this option can improve driver performance as well.
+            将触摸传感器单次扫描和连续扫描函数放入 IRAM，
+            以便这些函数可以在 IRAM 中安全运行，并能够在闪存缓存禁用时被调用。
+            启用此选项还可以提高驱动程序性能。
 
     config TOUCH_ISR_IRAM_SAFE
-        bool "Touch sensor ISR IRAM-Safe"
+        bool "触摸传感器 ISR IRAM 安全"
         default n
         help
-            Ensure the touch sensor interrupt is IRAM-Safe by allowing the interrupt handler to be
-            executable when the cache is disabled (e.g. SPI Flash write).
+            通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+            确保触摸传感器中断是 IRAM 安全的。
 
     config TOUCH_ENABLE_DEBUG_LOG
-        bool "Enable debug log"
+        bool "启用调试日志"
         default n
         help
-            Whether to enable the debug log message for touch driver.
-            Note that, this option only controls the touch driver log, won't affect other drivers.
+            是否为触摸驱动程序启用调试日志消息。
+            注意，此选项仅控制触摸驱动程序日志，不会影响其他驱动程序。
 
 endmenu # Touch Sensor Configuration

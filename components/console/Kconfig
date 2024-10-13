@@ -1,10 +1,10 @@
-menu "Console Library"
+menu "控制台库"
 
     config CONSOLE_SORTED_HELP
-        bool "Enable sorted help"
+        bool "启用排序帮助"
         default n
         help
-            Instead of listing the commands in the order of registration, the help command lists
-            the available commands in sorted order, if this option is enabled.
+            如果启用此选项，帮助命令将按排序顺序列出可用命令，
+            而不是按照注册顺序列出命令。
 
 endmenu

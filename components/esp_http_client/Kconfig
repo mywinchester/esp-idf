@@ -1,32 +1,31 @@
-menu "ESP HTTP client"
+menu "ESP HTTP 客户端"
 
 
     config ESP_HTTP_CLIENT_ENABLE_HTTPS
-        bool "Enable https"
+        bool "启用 HTTPS"
         default y
         help
-            This option will enable https protocol by linking esp-tls library and initializing SSL transport
+            此选项将通过链接 esp-tls 库并初始化 SSL 传输来启用 HTTPS 协议
 
     config ESP_HTTP_CLIENT_ENABLE_BASIC_AUTH
-        bool "Enable HTTP Basic Authentication"
+        bool "启用 HTTP 基本认证"
         default n
         help
-            This option will enable HTTP Basic Authentication. It is disabled by default as Basic
-            auth uses unencrypted encoding, so it introduces a vulnerability when not using TLS
+            此选项将启用 HTTP 基本认证。默认情况下它是禁用的，因为基本认证使用未加密的编码，
+            所以在不使用 TLS 时会引入安全漏洞
 
     config ESP_HTTP_CLIENT_ENABLE_DIGEST_AUTH
-        bool "Enable HTTP Digest Authentication"
+        bool "启用 HTTP 摘要认证"
         default n
         help
-            This option will enable HTTP Digest Authentication. It is enabled by default, but use of this
-            configuration is not recommended as the password can be derived from the exchange, so it introduces
-            a vulnerability when not using TLS
+            此选项将启用 HTTP 摘要认证。默认情况下它是启用的，但不建议使用此配置，
+            因为密码可以从交换中推导出来，所以在不使用 TLS 时会引入安全漏洞
 
     config ESP_HTTP_CLIENT_ENABLE_CUSTOM_TRANSPORT
-        bool "Enable custom transport"
+        bool "启用自定义传输"
         default n
         help
-            This option will enable injection of a custom tcp_transport handle, so the http operation
-            will be performed on top of the user defined transport abstraction (if configured)
+            此选项将启用注入自定义 tcp_transport 句柄，因此 HTTP 操作将在用户定义的
+            传输抽象之上执行（如果已配置）
 
 endmenu

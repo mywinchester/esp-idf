@@ -1,17 +1,16 @@
-menu "ESP-Driver:GPIO Configurations"
+menu "ESP-驱动：GPIO 配置"
     config GPIO_ESP32_SUPPORT_SWITCH_SLP_PULL
-        bool "Support light sleep GPIO pullup/pulldown configuration for ESP32"
+        bool "支持 ESP32 的轻度睡眠 GPIO 上拉/下拉配置"
         depends on IDF_TARGET_ESP32
         help
-            This option is intended to fix the bug that ESP32 is not able to switch to configured
-            pullup/pulldown mode in sleep.
-            If this option is selected, chip will automatically emulate the behaviour of switching,
-            and about 450B of source codes would be placed into IRAM.
+            此选项旨在修复 ESP32 在睡眠状态下无法切换到配置的上拉/下拉模式的错误。
+            如果选择此选项，芯片将自动模拟切换行为，
+            并将约 450B 的源代码放置到 IRAM 中。
 
     config GPIO_CTRL_FUNC_IN_IRAM
-        bool "Place GPIO control functions into IRAM"
+        bool "将 GPIO 控制函数放入 IRAM"
         default n
         help
-            Place GPIO control functions (like intr_disable/set_level) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in the other IRAM interrupt context.
+            将 GPIO 控制函数（如 intr_disable/set_level）放入 IRAM，
+            以便这些函数可以在 IRAM 中安全使用，并能够在其他 IRAM 中断上下文中被调用。
 endmenu

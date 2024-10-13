@@ -1,39 +1,36 @@
 choice RTC_CLK_SRC
-    prompt "RTC clock source"
+    prompt "RTC时钟源"
     default RTC_CLK_SRC_INT_RC
     help
-        Choose which clock is used as RTC clock source.
+        选择用作RTC时钟源的时钟。
 
     config RTC_CLK_SRC_INT_RC
-        bool "Internal 136kHz RC oscillator"
+        bool "内部136kHz RC振荡器"
     config RTC_CLK_SRC_EXT_CRYS
-        bool "External 32kHz crystal"
+        bool "外部32kHz晶体"
         select ESP_SYSTEM_RTC_EXT_XTAL
     config RTC_CLK_SRC_EXT_OSC
-        bool "External 32kHz oscillator at 32K_XP pin"
+        bool "32K_XP引脚上的外部32kHz振荡器"
         select ESP_SYSTEM_RTC_EXT_OSC
     config RTC_CLK_SRC_INT_8MD256
-        bool "Internal 17.5MHz oscillator, divided by 256"
+        bool "内部17.5MHz振荡器，除以256"
 endchoice
 
 config RTC_CLK_CAL_CYCLES
-    int "Number of cycles for RTC_SLOW_CLK calibration"
+    int "RTC_SLOW_CLK校准的周期数"
     default 3000 if RTC_CLK_SRC_EXT_CRYS || RTC_CLK_SRC_EXT_OSC || RTC_CLK_SRC_INT_8MD256
     default 1024 if RTC_CLK_SRC_INT_RC
     range 0 8190 if RTC_CLK_SRC_EXT_CRYS || RTC_CLK_SRC_EXT_OSC || RTC_CLK_SRC_INT_8MD256
     range 0 32766 if RTC_CLK_SRC_INT_RC
     help
-        When the startup code initializes RTC_SLOW_CLK, it can perform
-        calibration by comparing the RTC_SLOW_CLK frequency with main XTAL
-        frequency. This option sets the number of RTC_SLOW_CLK cycles measured
-        by the calibration routine. Higher numbers increase calibration
-        precision, which may be important for applications which spend a lot of
-        time in deep sleep. Lower numbers reduce startup time.
+        当启动代码初始化RTC_SLOW_CLK时，它可以通过比较RTC_SLOW_CLK频率与主XTAL
+        频率来执行校准。此选项设置校准例程测量的RTC_SLOW_CLK周期数。较高的数字
+        会增加校准精度，这对于长时间处于深度睡眠状态的应用程序可能很重要。较低
+        的数字会减少启动时间。
 
-        When this option is set to 0, clock calibration will not be performed at
-        startup, and approximate clock frequencies will be assumed:
+        当此选项设置为0时，启动时不会执行时钟校准，并且将假设近似的时钟频率：
 
-        - 150000 Hz if internal RC oscillator is used as clock source. For this use value 1024.
-        - 32768 Hz if the 32k crystal oscillator is used. For this use value 3000 or more.
-            In case more value will help improve the definition of the launch of the crystal.
-            If the crystal could not start, it will be switched to internal RC.
+        - 如果使用内部RC振荡器作为时钟源，则为150000 Hz。对此使用值1024。
+        - 如果使用32k晶体振荡器，则为32768 Hz。对此使用3000或更多的值。
+            在这种情况下，更多的值将有助于改善晶体启动的定义。
+            如果晶体无法启动，它将切换到内部RC。

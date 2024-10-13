@@ -1,21 +1,19 @@
 menu "ESP HTTPS OTA"
 
     config ESP_HTTPS_OTA_DECRYPT_CB
-        bool "Provide decryption callback"
+        bool "提供解密回调"
         default n
         help
-            Exposes an additional callback whereby firmware data could be decrypted
-            before being processed by OTA update component. This can help to integrate
-            external encryption related format and removal of such encapsulation layer
-            from firmware image.
+            暴露一个额外的回调，通过该回调可以在固件数据被OTA更新组件处理之前进行解密。
+            这有助于集成外部加密相关格式，并从固件镜像中移除此类封装层。
 
     config ESP_HTTPS_OTA_ALLOW_HTTP
-        bool "Allow HTTP for OTA (WARNING: ONLY FOR TESTING PURPOSE, READ HELP)"
+        bool "允许HTTP用于OTA（警告：仅用于测试目的，请阅读帮助）"
         default n
         help
-            It is highly recommended to keep HTTPS (along with server certificate validation) enabled.
-            Enabling this option comes with potential risk of:
-            - Non-encrypted communication channel with server
-            - Accepting firmware upgrade image from server with fake identity
+            强烈建议保持HTTPS（以及服务器证书验证）启用。
+            启用此选项可能带来以下潜在风险：
+            - 与服务器之间的非加密通信通道
+            - 接受来自具有虚假身份的服务器的固件升级镜像
 
 endmenu

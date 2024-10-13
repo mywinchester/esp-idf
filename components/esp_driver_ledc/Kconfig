@@ -1,11 +1,11 @@
-menu "ESP-Driver:LEDC Configurations"
+menu "ESP-驱动：LEDC 配置"
 
     config LEDC_CTRL_FUNC_IN_IRAM
-        bool "Place LEDC control functions into IRAM"
+        bool "将 LEDC 控制函数放入 IRAM"
         default n
         help
-            Place LEDC control functions (ledc_update_duty and ledc_stop) into IRAM,
-            so that these functions can be IRAM-safe and able to be called in an IRAM context.
-            Enabling this option can improve driver performance as well.
+            将 LEDC 控制函数（ledc_update_duty 和 ledc_stop）放入 IRAM，
+            以便这些函数可以在 IRAM 上下文中安全调用。
+            启用此选项还可以提高驱动程序性能。
 
 endmenu
