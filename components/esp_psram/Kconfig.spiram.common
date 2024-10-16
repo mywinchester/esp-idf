@@ -3,116 +3,104 @@
 # sourced into the "SPIRAM config" submenu for a specific chip.
 
 config SPIRAM_BOOT_INIT
-    bool "Initialize SPI RAM during startup"
+    bool "在启动期间初始化 SPI RAM"
     default "y"
     help
-        If this is enabled, the SPI RAM will be enabled during initial boot. Unless you
-        have specific requirements, you'll want to leave this enabled so memory allocated
-        during boot-up can also be placed in SPI RAM.
+        如果启用此选项，SPI RAM 将在初始启动期间被启用。除非您有特殊要求，否则您会希望保持此选项启用，
+        以便在启动过程中分配的内存也可以放置在 SPI RAM 中。
 
 config SPIRAM_IGNORE_NOTFOUND
-    bool "Ignore PSRAM when not found"
+    bool "未找到 PSRAM 时忽略"
     default "n"
     depends on SPIRAM_BOOT_INIT && !SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY && !SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY
     help
-        Normally, if psram initialization is enabled during compile time but not found at runtime, it
-        is seen as an error making the CPU panic. If this is enabled, booting will complete
-        but no PSRAM will be available. If PSRAM failed to initialize, the following configs may be affected
-        and may need to be corrected manually. SPIRAM_TRY_ALLOCATE_WIFI_LWIP will affect some LWIP and WiFi buffer
-        default values and range values. Enable SPIRAM_TRY_ALLOCATE_WIFI_LWIP, ESP_WIFI_AMSDU_TX_ENABLED,
-        ESP_WIFI_CACHE_TX_BUFFER_NUM and use static WiFi Tx buffer may cause potential memory exhaustion issues.
-        Suggest disable SPIRAM_TRY_ALLOCATE_WIFI_LWIP.
-        Suggest disable ESP_WIFI_AMSDU_TX_ENABLED.
-        Suggest disable ESP_WIFI_CACHE_TX_BUFFER_NUM,
-        need clear CONFIG_FEATURE_CACHE_TX_BUF_BIT of config->feature_caps.
-        Suggest change ESP_WIFI_TX_BUFFER from static to dynamic. Also suggest to adjust some buffer numbers to the
-        values used without PSRAM case. Such as, ESP_WIFI_STATIC_TX_BUFFER_NUM, ESP_WIFI_DYNAMIC_TX_BUFFER_NUM.
+        通常，如果在编译时启用了 psram 初始化但在运行时未找到，这将被视为错误并导致 CPU 崩溃。
+        如果启用此选项，启动将完成，但不会有可用的 PSRAM。如果 PSRAM 初始化失败，以下配置可能会受到影响，
+        可能需要手动更正。SPIRAM_TRY_ALLOCATE_WIFI_LWIP 将影响一些 LWIP 和 WiFi 缓冲区的默认值和范围值。
+        启用 SPIRAM_TRY_ALLOCATE_WIFI_LWIP、ESP_WIFI_AMSDU_TX_ENABLED、ESP_WIFI_CACHE_TX_BUFFER_NUM 
+        并使用静态 WiFi Tx 缓冲区可能会导致潜在的内存耗尽问题。
+        建议禁用 SPIRAM_TRY_ALLOCATE_WIFI_LWIP。
+        建议禁用 ESP_WIFI_AMSDU_TX_ENABLED。
+        建议禁用 ESP_WIFI_CACHE_TX_BUFFER_NUM，
+        需要清除 config->feature_caps 的 CONFIG_FEATURE_CACHE_TX_BUF_BIT。
+        建议将 ESP_WIFI_TX_BUFFER 从静态更改为动态。还建议将一些缓冲区数量调整为不使用 PSRAM 时的值。
+        例如，ESP_WIFI_STATIC_TX_BUFFER_NUM、ESP_WIFI_DYNAMIC_TX_BUFFER_NUM。
 
 choice SPIRAM_USE
-    prompt "SPI RAM access method"
+    prompt "SPI RAM 访问方法"
     default SPIRAM_USE_MALLOC
     help
-        The SPI RAM can be accessed in multiple methods: by just having it available as an unmanaged
-        memory region in the CPU's memory map, by integrating it in the heap as 'special' memory
-        needing heap_caps_malloc to allocate, or by fully integrating it making malloc() also able to
-        return SPI RAM pointers.
+        SPI RAM 可以通过多种方法访问：将其作为 CPU 内存映射中的未管理内存区域使用，
+        将其集成到堆中作为需要 heap_caps_malloc 分配的"特殊"内存，
+        或者完全集成使 malloc() 也能返回 SPI RAM 指针。
 
     config SPIRAM_USE_MEMMAP
-        bool "Integrate RAM into memory map"
+        bool "将 RAM 集成到内存映射中"
     config SPIRAM_USE_CAPS_ALLOC
-        bool "Make RAM allocatable using heap_caps_malloc(..., MALLOC_CAP_SPIRAM)"
+        bool "使 RAM 可通过 heap_caps_malloc(..., MALLOC_CAP_SPIRAM) 分配"
     config SPIRAM_USE_MALLOC
-        bool "Make RAM allocatable using malloc() as well"
+        bool "使 RAM 也可通过 malloc() 分配"
         select FREERTOS_SUPPORT_STATIC_ALLOCATION
 endchoice
 
 config SPIRAM_MEMTEST
-    bool "Run memory test on SPI RAM initialization"
+    bool "在 SPI RAM 初始化时运行内存测试"
     default "y"
     depends on SPIRAM_BOOT_INIT
     help
-        Runs a rudimentary memory test on initialization. Aborts when memory test fails. Disable this for
-        slightly faster startup.
+        在初始化时运行一个基本的内存测试。当内存测试失败时中止。禁用此选项可以略微加快启动速度。
 
 config SPIRAM_MALLOC_ALWAYSINTERNAL
-    int "Maximum malloc() size, in bytes, to always put in internal memory"
+    int "始终放入内部内存的最大 malloc() 大小（字节）"
     depends on SPIRAM_USE_MALLOC
     default 16384
     range 0 131072
     help
-        If malloc() is capable of also allocating SPI-connected ram, its allocation strategy will prefer to
-        allocate chunks less than this size in internal memory, while allocations larger than this will be
-        done from external RAM. If allocation from the preferred region fails, an attempt is made to allocate
-        from the non-preferred region instead, so malloc() will not suddenly fail when either internal or
-        external memory is full.
+        如果 malloc() 能够分配 SPI 连接的 RAM，其分配策略将倾向于在内部内存中分配小于此大小的块，
+        而大于此大小的分配将从外部 RAM 中进行。如果从首选区域分配失败，将尝试从非首选区域分配，
+        因此当内部或外部内存已满时，malloc() 不会突然失败。
 
 config SPIRAM_TRY_ALLOCATE_WIFI_LWIP
-    bool "Try to allocate memories of WiFi and LWIP in SPIRAM firstly. If failed, allocate internal memory"
+    bool "尝试首先在 SPIRAM 中分配 WiFi 和 LWIP 的内存。如果失败，则分配内部内存"
     depends on SPIRAM_USE_CAPS_ALLOC || SPIRAM_USE_MALLOC
     default "n"
     help
-        Try to allocate memories of WiFi and LWIP in SPIRAM firstly. If failed, try to allocate internal
-        memory then.
+        尝试首先在 SPIRAM 中分配 WiFi 和 LWIP 的内存。如果失败，则尝试分配内部内存。
 
 config SPIRAM_MALLOC_RESERVE_INTERNAL
-    int "Reserve this amount of bytes for data that specifically needs to be in DMA or internal memory"
+    int "为特别需要在 DMA 或内部内存中的数据保留这么多字节"
     depends on SPIRAM_USE_MALLOC
     default 32768
     range 0 262144
     help
-        Because the external/internal RAM allocation strategy is not always perfect, it sometimes may happen
-        that the internal memory is entirely filled up. This causes allocations that are specifically done in
-        internal memory, for example the stack for new tasks or memory to service DMA or have memory that's
-        also available when SPI cache is down, to fail. This option reserves a pool specifically for requests
-        like that; the memory in this pool is not given out when a normal malloc() is called.
+        由于外部/内部 RAM 分配策略并不总是完美的，有时可能会发生内部内存完全填满的情况。
+        这会导致特别在内部内存中进行的分配失败，例如新任务的堆栈或用于服务 DMA 或在 SPI 缓存关闭时
+        也可用的内存。此选项为这类请求保留一个专用池；当调用普通 malloc() 时，不会分配此池中的内存。
 
-        Set this to 0 to disable this feature.
+        将此设置为 0 以禁用此功能。
 
-        Note that because FreeRTOS stacks are forced to internal memory, they will also use this memory pool;
-        be sure to keep this in mind when adjusting this value.
+        请注意，由于 FreeRTOS 堆栈被强制使用内部内存，它们也将使用此内存池；
+        在调整此值时请务必考虑这一点。
 
-        Note also that the DMA reserved pool may not be one single contiguous memory region, depending on the
-        configured size and the static memory usage of the app.
+        还要注意，DMA 保留池可能不是一个连续的内存区域，这取决于配置的大小和应用程序的静态内存使用情况。
 
 config SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY
-    bool "Allow .bss segment placed in external memory"
+    bool "允许 .bss 段放置在外部内存中"
     default n
     depends on SPIRAM
     select ESP_ALLOW_BSS_SEG_EXTERNAL_MEMORY
     help
-        If enabled, variables with EXT_RAM_BSS_ATTR attribute will be placed in SPIRAM instead of internal DRAM.
-        BSS section of `lwip`, `net80211`, `pp`, `bt` libraries will be automatically placed
-        in SPIRAM. BSS sections from other object files and libraries can also be placed in SPIRAM through
-        linker fragment scheme `extram_bss`.
+        如果启用，带有 EXT_RAM_BSS_ATTR 属性的变量将被放置在 SPIRAM 中，而不是内部 DRAM 中。
+        `lwip`、`net80211`、`pp`、`bt` 库的 BSS 段将自动放置在 SPIRAM 中。
+        其他对象文件和库的 BSS 段也可以通过链接器片段方案 `extram_bss` 放置在 SPIRAM 中。
 
-        Note that the variables placed in SPIRAM using EXT_RAM_BSS_ATTR will be zero initialized.
+        请注意，使用 EXT_RAM_BSS_ATTR 放置在 SPIRAM 中的变量将被初始化为零。
 
 config SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY
-    bool "Allow .noinit segment placed in external memory"
+    bool "允许 .noinit 段放置在外部内存中"
     default n
     depends on SPIRAM
     help
-        If enabled, noinit variables can be placed in PSRAM using EXT_RAM_NOINIT_ATTR.
+        如果启用，noinit 变量可以使用 EXT_RAM_NOINIT_ATTR 放置在 PSRAM 中。
 
-        Note the values placed into this section will not be initialized at startup and should keep its value
-        after software restart.
+        请注意，放入此段的值在启动时不会被初始化，并且在软件重启后应保持其值。

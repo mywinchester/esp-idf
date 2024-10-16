@@ -1,47 +1,46 @@
-menu "LCD and Touch Panel"
+menu "LCD 和触摸面板"
     comment "LCD Touch Drivers are maintained in the IDF Component Registry"
 
-    menu "LCD Peripheral Configuration"
+    menu "LCD 外设配置"
         config LCD_ENABLE_DEBUG_LOG
-            bool "Enable debug log"
+            bool "启用调试日志"
             default n
             help
-                whether to enable the debug log message for LCD driver.
-                Note that, this option only controls the LCD driver log, won't affect other drivers.
+                是否为 LCD 驱动启用调试日志消息。
+                注意，此选项仅控制 LCD 驱动日志，不会影响其他驱动程序。
 
         if SOC_LCD_RGB_SUPPORTED
             config LCD_RGB_ISR_IRAM_SAFE
-                bool "RGB LCD ISR IRAM-Safe"
+                bool "RGB LCD ISR IRAM 安全"
                 default n
                 help
-                    Ensure the LCD interrupt is IRAM-Safe by allowing the interrupt handler to be
-                    executable when the cache is disabled (e.g. SPI Flash write).
-                    If you want the LCD driver to keep flushing the screen even when cache ops disabled,
-                    you can enable this option. Note, this will also increase the IRAM usage.
+                    通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+                    确保 LCD 中断是 IRAM 安全的。
+                    如果您希望 LCD 驱动程序在缓存操作禁用时继续刷新屏幕，
+                    可以启用此选项。注意，这也会增加 IRAM 的使用量。
 
             config LCD_RGB_RESTART_IN_VSYNC
-                bool "Restart transmission in VSYNC"
+                bool "在 VSYNC 中重新启动传输"
                 default n
                 select GDMA_CTRL_FUNC_IN_IRAM # need to restart GDMA in the LCD ISR
                 help
-                    Reset the GDMA channel every VBlank to stop permanent desyncs from happening.
-                    Only need to enable it when in your application, the DMA can't deliver data
-                    as fast as the LCD consumes it.
+                    每个 VBlank 重置 GDMA 通道以防止永久性不同步发生。
+                    仅在您的应用程序中 DMA 无法像 LCD 消耗数据那样快速传输数据时才需要启用它。
         endif # SOC_LCD_RGB_SUPPORTED
 
         if SOC_MIPI_DSI_SUPPORTED
             config LCD_DSI_ISR_IRAM_SAFE
-                bool "DSI LCD ISR IRAM-Safe"
+                bool "DSI LCD ISR IRAM 安全"
                 default n
                 select DW_GDMA_ISR_IRAM_SAFE
                 select DW_GDMA_CTRL_FUNC_IN_IRAM
                 select DW_GDMA_SETTER_FUNC_IN_IRAM
                 select DW_GDMA_GETTER_FUNC_IN_IRAM
                 help
-                    Ensure the LCD interrupt is IRAM-Safe by allowing the interrupt handler to be
-                    executable when the cache is disabled (e.g. SPI Flash write).
-                    If you want the LCD driver to keep flushing the screen even when cache ops disabled,
-                    you can enable this option. Note, this will also increase the IRAM usage.
+                    通过允许中断处理程序在缓存禁用时（例如 SPI Flash 写入）可执行，
+                    确保 LCD 中断是 IRAM 安全的。
+                    如果您希望 LCD 驱动程序在缓存操作禁用时继续刷新屏幕，
+                    可以启用此选项。注意，这也会增加 IRAM 的使用量。
         endif # SOC_MIPI_DSI_SUPPORTED
     endmenu
 endmenu

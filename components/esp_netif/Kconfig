@@ -1,35 +1,32 @@
-menu "ESP NETIF Adapter"
+menu "ESP NETIF 适配器"
 
     config ESP_NETIF_IP_LOST_TIMER_INTERVAL
-        int "IP Address lost timer interval (seconds)"
+        int "IP 地址丢失计时器间隔（秒）"
         range 0 65535
         default 120
         help
-            The value of 0 indicates the IP lost timer is disabled, otherwise the timer is enabled.
+            值为 0 表示 IP 丢失计时器被禁用，否则计时器将被启用。
 
-            The IP address may be lost because of some reasons, e.g. when the station disconnects
-            from soft-AP, or when DHCP IP renew fails etc. If the IP lost timer is enabled, it will
-            be started every time the IP is lost. Event SYSTEM_EVENT_STA_LOST_IP will be raised if
-            the timer expires. The IP lost timer is stopped if the station get the IP again before
-            the timer expires.
+            IP 地址可能因某些原因而丢失，例如当站点与软 AP 断开连接时，或当 DHCP IP 续约失败等。
+            如果 IP 丢失计时器被启用，它将在每次 IP 丢失时启动。如果计时器到期，将触发 SYSTEM_EVENT_STA_LOST_IP 事件。
+            如果站点在计时器到期之前重新获得 IP，IP 丢失计时器将停止。
 
     choice ESP_NETIF_USE_TCPIP_STACK_LIB
-        prompt "TCP/IP Stack Library"
+        prompt "TCP/IP 协议栈库"
         default ESP_NETIF_TCPIP_LWIP
         help
-            Choose the TCP/IP Stack to work, for example, LwIP, uIP, etc.
+            选择要使用的 TCP/IP 协议栈，例如 LwIP、uIP 等。
         config ESP_NETIF_TCPIP_LWIP
             bool "LwIP"
             select ESP_NETIF_USES_TCPIP_WITH_BSD_API
             depends on LWIP_ENABLE
             help
-                lwIP is a small independent implementation of the TCP/IP protocol suite.
+                lwIP 是 TCP/IP 协议套件的一个小型独立实现。
 
         config ESP_NETIF_LOOPBACK
-            bool "Loopback"
+            bool "回环"
             help
-                Dummy implementation of esp-netif functionality which connects driver transmit
-                to receive function. This option is for testing purpose only
+                esp-netif 功能的虚拟实现，将驱动程序的发送功能连接到接收功能。此选项仅用于测试目的。
 
     endchoice
 
@@ -37,55 +34,52 @@ menu "ESP NETIF Adapter"
         bool # Set to true if the chosen TCP/IP stack provides BSD socket API
 
     config ESP_NETIF_RECEIVE_REPORT_ERRORS
-        bool "Use esp_err_t to report errors from esp_netif_receive"
+        bool "使用 esp_err_t 报告 esp_netif_receive 的错误"
         default n
         help
-            Enable if esp_netif_receive() should return error code. This is useful to inform upper layers
-            that packet input to TCP/IP stack failed, so the upper layers could implement flow control.
-            This option is disabled by default due to backward compatibility and will be enabled in v6.0 (IDF-7194)
+            启用此选项，esp_netif_receive() 将返回错误代码。这对于通知上层数据包输入到 TCP/IP 协议栈失败很有用，
+            以便上层可以实现流量控制。由于向后兼容性，此选项默认禁用，将在 v6.0 中启用（IDF-7194）。
 
     config ESP_NETIF_L2_TAP
-        bool "Enable netif L2 TAP support"
+        bool "启用 netif L2 TAP 支持"
         select ETH_TRANSMIT_MUTEX
         help
-            A user program can read/write link layer (L2) frames from/to ESP TAP device.
-            The ESP TAP device can be currently associated only with Ethernet physical interfaces.
+            用户程序可以从/向 ESP TAP 设备读取/写入链路层（L2）帧。
+            ESP TAP 设备目前只能与以太网物理接口关联。
 
     config ESP_NETIF_L2_TAP_MAX_FDS
         depends on ESP_NETIF_L2_TAP
-        int "Maximum number of opened L2 TAP File descriptors"
+        int "打开的 L2 TAP 文件描述符的最大数量"
         range 1 10
         default 5
         help
-            Maximum number of opened File descriptors (FD's) associated with ESP TAP device. ESP TAP FD's take up
-            a certain amount of memory, and allowing fewer FD's to be opened at the same time conserves memory.
+            与 ESP TAP 设备关联的打开的文件描述符（FD）的最大数量。ESP TAP FD 会占用一定量的内存，
+            允许同时打开较少的 FD 可以节省内存。
 
     config ESP_NETIF_L2_TAP_RX_QUEUE_SIZE
         depends on ESP_NETIF_L2_TAP
-        int "Size of L2 TAP Rx queue"
+        int "L2 TAP 接收队列大小"
         range 1 100
         default 20
         help
-            Maximum number of frames queued in opened File descriptor. Once the queue is full, the newly arriving
-            frames are dropped until the queue has enough room to accept incoming traffic (Tail Drop queue
-            management).
+            打开的文件描述符中排队的最大帧数。一旦队列满了，新到达的帧将被丢弃，
+            直到队列有足够的空间接受传入流量（尾部丢弃队列管理）。
 
     config ESP_NETIF_BRIDGE_EN
         depends on ESP_NETIF_TCPIP_LWIP
-        bool "Enable LwIP IEEE 802.1D bridge"
+        bool "启用 LwIP IEEE 802.1D 桥接"
         default n
         help
-            Enable LwIP IEEE 802.1D bridge support in ESP-NETIF. Note that "Number of clients store data in netif"
-            (LWIP_NUM_NETIF_CLIENT_DATA) option needs to be properly configured to be LwIP bridge available!
+            在 ESP-NETIF 中启用 LwIP IEEE 802.1D 桥接支持。请注意，"存储在 netif 中的客户端数据数量"
+            （LWIP_NUM_NETIF_CLIENT_DATA）选项需要正确配置才能使 LwIP 桥接可用！
 
     config ESP_NETIF_SET_DNS_PER_DEFAULT_NETIF
-        bool "Enable DNS server per interface"
+        bool "为每个接口启用 DNS 服务器"
         default n
         select LWIP_DNS_SETSERVER_WITH_NETIF
         help
-            Enable this option to use the DNS server which belongs to the selected default network interface.
-            This feature collects DNS server and netif information from LWIP core modules.
-            Whenever a new default netif is selected, global DNS servers in LWIP are updated with the netif
-            related servers.
+            启用此选项以使用属于所选默认网络接口的 DNS 服务器。
+            此功能从 LWIP 核心模块收集 DNS 服务器和 netif 信息。
+            每当选择新的默认 netif 时，LWIP 中的全局 DNS 服务器将更新为与 netif 相关的服务器。
 
 endmenu

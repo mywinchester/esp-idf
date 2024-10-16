@@ -1,9 +1,9 @@
 choice ESP_DEFAULT_CPU_FREQ_MHZ
-    prompt "CPU frequency"
+    prompt "CPU 频率"
     default ESP_DEFAULT_CPU_FREQ_MHZ_40 if IDF_ENV_FPGA
     default ESP_DEFAULT_CPU_FREQ_MHZ_160
     help
-        CPU frequency to be set on application startup.
+        应用程序启动时要设置的 CPU 频率。
 
     config ESP_DEFAULT_CPU_FREQ_MHZ_40
         bool "40 MHz"

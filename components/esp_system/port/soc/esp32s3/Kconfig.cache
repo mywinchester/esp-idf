@@ -1,12 +1,12 @@
-menu "Cache config"
+menu "缓存配置"
 
     choice ESP32S3_INSTRUCTION_CACHE_SIZE
-        prompt "Instruction cache size"
+        prompt "指令缓存大小"
         default ESP32S3_INSTRUCTION_CACHE_16KB
         help
-            Instruction cache size to be set on application startup.
-            If you use 16KB instruction cache rather than 32KB instruction cache,
-            then the other 16KB will be managed by heap allocator.
+            应用程序启动时要设置的指令缓存大小。
+            如果您使用16KB指令缓存而不是32KB指令缓存，
+            那么另外的16KB将由堆分配器管理。
 
         config ESP32S3_INSTRUCTION_CACHE_16KB
             bool "16KB"
@@ -20,15 +20,15 @@ menu "Cache config"
         default 0x8000 if ESP32S3_INSTRUCTION_CACHE_32KB
 
     choice ESP32S3_ICACHE_ASSOCIATED_WAYS
-        prompt "Instruction cache associated ways"
+        prompt "指令缓存关联路数"
         default ESP32S3_INSTRUCTION_CACHE_8WAYS
         help
-            Instruction cache associated ways to be set on application startup.
+            应用程序启动时要设置的指令缓存关联路数。
 
         config ESP32S3_INSTRUCTION_CACHE_4WAYS
-            bool "4 ways"
+            bool "4路"
         config ESP32S3_INSTRUCTION_CACHE_8WAYS
-            bool "8 ways"
+            bool "8路"
     endchoice
 
     config ESP32S3_ICACHE_ASSOCIATED_WAYS
@@ -37,16 +37,16 @@ menu "Cache config"
         default 8 if ESP32S3_INSTRUCTION_CACHE_8WAYS
 
     choice ESP32S3_INSTRUCTION_CACHE_LINE_SIZE
-        prompt "Instruction cache line size"
+        prompt "指令缓存行大小"
         default ESP32S3_INSTRUCTION_CACHE_LINE_32B
         help
-            Instruction cache line size to be set on application startup.
+            应用程序启动时要设置的指令缓存行大小。
 
         config ESP32S3_INSTRUCTION_CACHE_LINE_16B
-            bool "16 Bytes"
+            bool "16字节"
             depends on ESP32S3_INSTRUCTION_CACHE_16KB
         config ESP32S3_INSTRUCTION_CACHE_LINE_32B
-            bool "32 Bytes"
+            bool "32字节"
     endchoice
 
     config ESP32S3_INSTRUCTION_CACHE_LINE_SIZE
@@ -59,17 +59,17 @@ menu "Cache config"
         default "n"
         depends on !SPIRAM_ECC_ENABLE
         help
-            If enabled, instruction cache will use wrap mode to read spi flash or spi ram.
-            The wrap length equals to ESP32S3_INSTRUCTION_CACHE_LINE_SIZE.
-            However, it depends on complex conditions.
+            如果启用，指令缓存将使用包装模式读取SPI闪存或SPI RAM。
+            包装长度等于ESP32S3_INSTRUCTION_CACHE_LINE_SIZE。
+            然而，这取决于复杂的条件。
 
     choice ESP32S3_DATA_CACHE_SIZE
-        prompt "Data cache size"
+        prompt "数据缓存大小"
         default ESP32S3_DATA_CACHE_32KB
         help
-            Data cache size to be set on application startup.
-            If you use 32KB data cache rather than 64KB data cache,
-            the other 32KB will be added to the heap.
+            应用程序启动时要设置的数据缓存大小。
+            如果您使用32KB数据缓存而不是64KB数据缓存，
+            另外的32KB将被添加到堆中。
 
         config ESP32S3_DATA_CACHE_16KB
             bool "16KB"
@@ -87,15 +87,15 @@ menu "Cache config"
         default 0x10000 if ESP32S3_DATA_CACHE_64KB
 
     choice ESP32S3_DCACHE_ASSOCIATED_WAYS
-        prompt "Data cache associated ways"
+        prompt "数据缓存关联路数"
         default ESP32S3_DATA_CACHE_8WAYS
         help
-            Data cache associated ways to be set on application startup.
+            应用程序启动时要设置的数据缓存关联路数。
 
         config ESP32S3_DATA_CACHE_4WAYS
-            bool "4 ways"
+            bool "4路"
         config ESP32S3_DATA_CACHE_8WAYS
-            bool "8 ways"
+            bool "8路"
     endchoice
 
     config ESP32S3_DCACHE_ASSOCIATED_WAYS
@@ -104,18 +104,18 @@ menu "Cache config"
         default 8 if ESP32S3_DATA_CACHE_8WAYS
 
     choice ESP32S3_DATA_CACHE_LINE_SIZE
-        prompt "Data cache line size"
+        prompt "数据缓存行大小"
         default ESP32S3_DATA_CACHE_LINE_32B
         help
-            Data cache line size to be set on application startup.
+            应用程序启动时要设置的数据缓存行大小。
 
         config ESP32S3_DATA_CACHE_LINE_16B
-            bool "16 Bytes"
+            bool "16字节"
             depends on ESP32S3_DATA_CACHE_16KB || ESP32S3_DATA_CACHE_32KB
         config ESP32S3_DATA_CACHE_LINE_32B
-            bool "32 Bytes"
+            bool "32字节"
         config ESP32S3_DATA_CACHE_LINE_64B
-            bool "64 Bytes"
+            bool "64字节"
     endchoice
 
     config ESP32S3_DATA_CACHE_LINE_SIZE
@@ -129,8 +129,8 @@ menu "Cache config"
         default "n"
         depends on !SPIRAM_ECC_ENABLE
         help
-            If enabled, data cache will use wrap mode to read spi flash or spi ram.
-            The wrap length equals to ESP32S3_DATA_CACHE_LINE_SIZE.
-            However, it depends on complex conditions.
+            如果启用，数据缓存将使用包装模式读取SPI闪存或SPI RAM。
+            包装长度等于ESP32S3_DATA_CACHE_LINE_SIZE。
+            然而，这取决于复杂的条件。
 
 endmenu  # Cache config

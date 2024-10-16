@@ -1,25 +1,23 @@
-menu "ESP Ringbuf"
+menu "ESP 环形缓冲区"
 
 
     config RINGBUF_PLACE_FUNCTIONS_INTO_FLASH
-        bool "Place non-ISR ringbuf functions into flash"
+        bool "将非 ISR 环形缓冲区函数放入闪存"
         default n
         help
-            Place non-ISR ringbuf functions (like xRingbufferCreate/xRingbufferSend) into flash.
-            This frees up IRAM, but the functions can no longer be called when the cache is disabled.
+            将非 ISR 环形缓冲区函数（如 xRingbufferCreate/xRingbufferSend）放入闪存。
+            这可以释放 IRAM，但当缓存被禁用时，这些函数将无法被调用。
 
 
     config RINGBUF_PLACE_ISR_FUNCTIONS_INTO_FLASH
-        bool "Place ISR ringbuf functions into flash"
+        bool "将 ISR 环形缓冲区函数放入闪存"
         depends on RINGBUF_PLACE_FUNCTIONS_INTO_FLASH
         default n
         help
-            Place ISR ringbuf functions (like xRingbufferSendFromISR/xRingbufferReceiveFromISR) into flash.
-            This frees up IRAM, but the functions can no longer be called when the cache is disabled
-            or from an IRAM interrupt context.
+            将 ISR 环形缓冲区函数（如 xRingbufferSendFromISR/xRingbufferReceiveFromISR）放入闪存。
+            这可以释放 IRAM，但当缓存被禁用或从 IRAM 中断上下文调用时，这些函数将无法被调用。
 
-            This option is not compatible with ESP-IDF drivers which are configured to
-            run the ISR from an IRAM context, e.g. CONFIG_UART_ISR_IN_IRAM.
+            此选项与配置为从 IRAM 上下文运行 ISR 的 ESP-IDF 驱动程序不兼容，例如 CONFIG_UART_ISR_IN_IRAM。
 
 
 endmenu

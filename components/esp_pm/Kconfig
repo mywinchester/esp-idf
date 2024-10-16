@@ -1,82 +1,79 @@
-menu "Power Management"
+menu "电源管理"
     config PM_ENABLE
-        bool "Support for power management"
+        bool "支持电源管理"
         # SMP FreeRTOS currently does not support power management IDF-4997
         depends on (!FREERTOS_SMP && SOC_PM_SUPPORTED) || __DOXYGEN__
         default n
         help
-            If enabled, application is compiled with support for power management.
-            This option has run-time overhead (increased interrupt latency,
-            longer time to enter idle state), and it also reduces accuracy of
-            RTOS ticks and timers used for timekeeping.
-            Enable this option if application uses power management APIs.
+            如果启用，应用程序将编译支持电源管理。
+            此选项会增加运行时开销（增加中断延迟，
+            进入空闲状态的时间更长），并且还会降低
+            RTOS 滴答和用于计时的定时器的精确度。
+            如果应用程序使用电源管理 API，请启用此选项。
 
     config PM_DFS_INIT_AUTO
-        bool "Enable dynamic frequency scaling (DFS) at startup"
+        bool "在启动时启用动态频率缩放（DFS）"
         depends on PM_ENABLE
         default n
         help
-            If enabled, startup code configures dynamic frequency scaling.
-            Max CPU frequency is set to DEFAULT_CPU_FREQ_MHZ setting,
-            min frequency is set to XTAL frequency.
-            If disabled, DFS will not be active until the application
-            configures it using esp_pm_configure function.
+            如果启用，启动代码将配置动态频率缩放。
+            最大 CPU 频率设置为 DEFAULT_CPU_FREQ_MHZ 设置，
+            最小频率设置为 XTAL 频率。
+            如果禁用，DFS 将不会激活，直到应用程序
+            使用 esp_pm_configure 函数进行配置。
 
     config PM_PROFILING
-        bool "Enable profiling counters for PM locks"
+        bool "为 PM 锁启用分析计数器"
         depends on PM_ENABLE
         default n
         help
-            If enabled, esp_pm_* functions will keep track of the amount of time
-            each of the power management locks has been held, and esp_pm_dump_locks
-            function will print this information.
-            This feature can be used to analyze which locks are preventing the chip
-            from going into a lower power state, and see what time the chip spends
-            in each power saving mode. This feature does incur some run-time
-            overhead, so should typically be disabled in production builds.
+            如果启用，esp_pm_* 函数将跟踪每个电源管理锁
+            持有的时间量，esp_pm_dump_locks 函数将打印此信息。
+            此功能可用于分析哪些锁阻止芯片进入低功耗状态，
+            并查看芯片在每种省电模式下花费的时间。
+            此功能会产生一些运行时开销，因此通常应在生产版本中禁用。
 
     config PM_TRACE
-        bool "Enable debug tracing of PM using GPIOs"
+        bool "使用 GPIO 启用 PM 调试跟踪"
         depends on PM_ENABLE
         default n
         help
-            If enabled, some GPIOs will be used to signal events such as RTOS ticks,
-            frequency switching, entry/exit from idle state. Refer to pm_trace.c
-            file for the list of GPIOs.
-            This feature is intended to be used when analyzing/debugging behavior
-            of power management implementation, and should be kept disabled in
-            applications.
+            如果启用，一些 GPIO 将用于发出诸如 RTOS 滴答、
+            频率切换、进入/退出空闲状态等事件的信号。
+            请参阅 pm_trace.c 文件以获取 GPIO 列表。
+            此功能旨在用于分析/调试电源管理实现的行为，
+            应在应用程序中保持禁用状态。
 
     config PM_SLP_IRAM_OPT
-        bool "Put lightsleep related codes in internal RAM"
+        bool "将轻度睡眠相关代码放入内部 RAM"
         depends on SOC_LIGHT_SLEEP_SUPPORTED
         help
-            If enabled, about 2.1KB of lightsleep related source code would be in IRAM and chip would sleep
-            longer for 310us at 160MHz CPU frequency most each time.
-            This feature is intended to be used when lower power consumption is needed
-            while there is enough place in IRAM to place source code.
+            如果启用，约 2.1KB 的轻度睡眠相关源代码将放入 IRAM，
+            芯片在 160MHz CPU 频率下每次睡眠时间将延长 310us。
+            当需要更低功耗且 IRAM 中有足够空间放置源代码时，
+            可以使用此功能。
 
     config PM_RTOS_IDLE_OPT
-        bool "Put RTOS IDLE related codes in internal RAM"
+        bool "将 RTOS 空闲相关代码放入内部 RAM"
         depends on FREERTOS_USE_TICKLESS_IDLE
         help
-            If enabled, about 180Bytes of RTOS_IDLE related source code would be in IRAM and chip would sleep
-            longer for 20us at 160MHz CPU frequency most each time.
-            This feature is intended to be used when lower power consumption is needed
-            while there is enough place in IRAM to place source code.
+            如果启用，约 180 字节的 RTOS_IDLE 相关源代码将放入 IRAM，
+            芯片在 160MHz CPU 频率下每次睡眠时间将延长 20us。
+            当需要更低功耗且 IRAM 中有足够空间放置源代码时，
+            可以使用此功能。
 
     config PM_SLP_DISABLE_GPIO
-        bool "Disable all GPIO when chip at sleep"
+        bool "芯片睡眠时禁用所有 GPIO"
         depends on FREERTOS_USE_TICKLESS_IDLE
         help
-            This feature is intended to disable all GPIO pins at automantic sleep to get a lower power mode.
-            If enabled, chips will disable all GPIO pins at automantic sleep to reduce about 200~300 uA current.
-            If you want to specifically use some pins normally as chip wakes when chip sleeps,
-            you can call 'gpio_sleep_sel_dis' to disable this feature on those pins.
-            You can also keep this feature on and call 'gpio_sleep_set_direction' and 'gpio_sleep_set_pull_mode'
-            to have a different GPIO configuration at sleep.
-            Warning: If you want to enable this option on ESP32, you should enable `GPIO_ESP32_SUPPORT_SWITCH_SLP_PULL`
-            at first, otherwise you will not be able to switch pullup/pulldown mode.
+            此功能旨在在自动睡眠时禁用所有 GPIO 引脚以获得更低的功耗模式。
+            如果启用，芯片将在自动睡眠时禁用所有 GPIO 引脚，以减少约 200~300 uA 的电流。
+            如果您希望在芯片睡眠时正常使用某些引脚作为芯片唤醒，
+            可以调用 'gpio_sleep_sel_dis' 在这些引脚上禁用此功能。
+            您也可以保持此功能开启，并调用 'gpio_sleep_set_direction' 和 'gpio_sleep_set_pull_mode'
+            以在睡眠时使用不同的 GPIO 配置。
+            警告：如果您想在 ESP32 上启用此选项，您应该首先启用 `GPIO_ESP32_SUPPORT_SWITCH_SLP_PULL`，
+            否则您将无法切换上拉/下拉模式。
 
     config PM_SLP_DEFAULT_PARAMS_OPT
         bool
@@ -89,99 +86,96 @@ menu "Power Management"
         default y if IDF_CI_BUILD
         default n
         help
-            This option is invisible to users, and it is only used for ci testing,
-            enabling it in the application will increase the sleep and wake-up time overhead
+            此选项对用户不可见，仅用于 CI 测试，
+            在应用程序中启用它将增加睡眠和唤醒时间开销
 
     config PM_LIGHTSLEEP_RTC_OSC_CAL_INTERVAL
-        int "Calibrate the RTC_FAST/SLOW clock every N times of light sleep"
+        int "每 N 次轻度睡眠校准 RTC_FAST/SLOW 时钟"
         default 1
         depends on PM_ENABLE
         range 1 128
         help
-            The value of this option determines the calibration interval of the RTC_FAST/SLOW clock during sleep when
-            power management is enabled. When it is configured as N, the RTC_FAST/SLOW clock will be calibrated
-            every N times of lightsleep.
-            Decreasing this value will increase the time the chip is in the active state, thereby increasing the
-            average power consumption of the chip.
-            Increasing this value can reduce the average power consumption, but when the external environment changes
-            drastically and the chip RTC_FAST/SLOW oscillator frequency drifts, it may cause system instability.
+            此选项的值决定了启用电源管理时睡眠期间 RTC_FAST/SLOW 时钟的校准间隔。
+            当配置为 N 时，RTC_FAST/SLOW 时钟将每 N 次轻度睡眠校准一次。
+            减小此值将增加芯片处于活动状态的时间，从而增加芯片的平均功耗。
+            增加此值可以降低平均功耗，但当外部环境发生剧烈变化且芯片 RTC_FAST/SLOW
+            振荡器频率漂移时，可能会导致系统不稳定。
 
     config PM_POWER_DOWN_CPU_IN_LIGHT_SLEEP
-        bool "Power down CPU in light sleep"
+        bool "在轻度睡眠中关闭 CPU 电源"
         depends on SOC_PM_SUPPORT_CPU_PD
         select PM_RESTORE_CACHE_TAGMEM_AFTER_LIGHT_SLEEP if ESP32S3_DATA_CACHE_16KB
         default y
         help
-            If enabled, the CPU will be powered down in light sleep,
-            ESP chips supports saving and restoring CPU's running context before and after light sleep,
-            the feature provides applications with seamless CPU powerdowned lightsleep without user awareness.
-            But this will takes up some internal memory.
-            On esp32c3 soc, enabling this option will consume 1.68 KB of internal RAM
-            and will reduce sleep current consumption by about 100 uA.
-            On esp32s3 soc, enabling this option will consume 8.58 KB of internal RAM
-            and will reduce sleep current consumption by about 650 uA.
+            如果启用，CPU 将在轻度睡眠中关闭电源，
+            ESP 芯片支持在轻度睡眠前后保存和恢复 CPU 的运行上下文，
+            该功能为应用程序提供无缝的 CPU 断电轻度睡眠，无需用户察觉。
+            但这将占用一些内部内存。
+            在 esp32c3 芯片上，启用此选项将消耗 1.68 KB 的内部 RAM，
+            并将减少睡眠电流消耗约 100 uA。
+            在 esp32s3 芯片上，启用此选项将消耗 8.58 KB 的内部 RAM，
+            并将减少睡眠电流消耗约 650 uA。
 
     config PM_RESTORE_CACHE_TAGMEM_AFTER_LIGHT_SLEEP
-        bool "Restore I/D-cache tag memory after power down CPU light sleep"
+        bool "在 CPU 轻度睡眠断电后恢复 I/D-cache 标记内存"
         depends on IDF_TARGET_ESP32S3 && PM_POWER_DOWN_CPU_IN_LIGHT_SLEEP
         default y
         help
-            Cache tag memory and CPU both belong to the CPU power domain.
-            ESP chips supports saving and restoring Cache tag memory before and after sleep,
-            this feature supports accesses to the external memory that was cached before sleep still
-            be cached when the CPU wakes up from a powerdowned CPU lightsleep.
-            This option controls the restore method for Cache tag memory in lightsleep.
-            If this option is enabled, the I/D-cache tag memory will be backuped to the internal RAM
-            before sleep and restored upon wakeup.
-            Depending on the the cache configuration, if this option is enabled,
-            it will consume up to 9 KB of internal RAM.
-            If this option is disabled, all cached data won't be kept after sleep,
-            the DCache will be writeback before sleep and invalid all cached data after sleep,
-            all accesses to external memory(Flash/PSRAM) will be cache missed after waking up,
-            resulting in performance degradation due to increased memory accesses latency.
+            缓存标记内存和 CPU 都属于 CPU 电源域。
+            ESP 芯片支持在睡眠前后保存和恢复缓存标记内存，
+            此功能支持在 CPU 从断电轻度睡眠唤醒时，
+            仍然可以缓存睡眠前已缓存的外部内存访问。
+            此选项控制轻度睡眠中缓存标记内存的恢复方法。
+            如果启用此选项，I/D-cache 标记内存将在睡眠前备份到内部 RAM，
+            并在唤醒时恢复。
+            根据缓存配置，如果启用此选项，
+            它将消耗最多 9 KB 的内部 RAM。
+            如果禁用此选项，所有缓存数据在睡眠后将不会保留，
+            DCache 将在睡眠前回写并在睡眠后使所有缓存数据无效，
+            唤醒后对外部内存（Flash/PSRAM）的所有访问将导致缓存未命中，
+            由于增加的内存访问延迟，导致性能下降。
 
     config PM_POWER_DOWN_PERIPHERAL_IN_LIGHT_SLEEP
-        bool "Power down Digital Peripheral in light sleep (EXPERIMENTAL)"
+        bool "在轻度睡眠中关闭数字外设电源（实验性）"
         depends on SOC_PM_SUPPORT_TOP_PD && SOC_PAU_SUPPORTED
         select PM_POWER_DOWN_CPU_IN_LIGHT_SLEEP if !SOC_CPU_IN_TOP_DOMAIN
         default n #TODO: enable by default if periph init/deinit management supported (WIFI-5252)
         help
-            If enabled, digital peripherals will be powered down in light sleep, it will reduce sleep
-            current consumption by about 100 uA. Chip will save/restore register context at sleep/wake
-            time to keep the system running. Enabling this option will increase static RAM and heap usage,
-            the actual cost depends on the peripherals you have initialized. In order to save/restore the
-            context of the necessary hardware for FreeRTOS to run, it will need at least 4.55 KB free heap
-            at sleep time. Otherwise sleep will not power down the peripherals.
+            如果启用，数字外设将在轻度睡眠中关闭电源，这将减少睡眠
+            电流消耗约 100 uA。芯片将在睡眠/唤醒时保存/恢复寄存器上下文
+            以保持系统运行。启用此选项将增加静态 RAM 和堆使用量，
+            实际成本取决于您已初始化的外设。为了保存/恢复
+            FreeRTOS 运行所需的必要硬件上下文，在睡眠时至少需要 4.55 KB 的可用堆。
+            否则，睡眠将不会关闭外设电源。
 
-            Note1: Please use this option with caution, the current IDF does not support the retention of
-            all peripherals. When the digital peripherals are powered off and a sleep and wake-up is completed,
-            the peripherals that have not saved the running context are equivalent to performing a reset.
-            !!! Please confirm the peripherals used in your application and their sleep retention support status
-            before enabling this option, peripherals sleep retention driver support status is tracked in
-            power_management.rst
+            注1：请谨慎使用此选项，当前 IDF 不支持所有外设的保留。
+            当数字外设断电并完成一次睡眠和唤醒时，
+            未保存运行上下文的外设相当于执行了一次复位。
+            !!! 在启用此选项之前，请确认您的应用程序中使用的外设及其睡眠保留支持状态，
+            外设睡眠保留驱动程序支持状态在 power_management.rst 中进行跟踪
 
-            Note2: When this option is enabled simultaneously with FREERTOS_USE_TICKLESS_IDLE, since the UART will
-            be powered down, the uart FIFO will be flushed before sleep to avoid data loss, however, this has the
-            potential to block the sleep process and cause the wakeup time to be skipped, which will cause the tick
-            of freertos to not be compensated correctly when returning from sleep and cause the system to crash.
-            To avoid this, you can increase FREERTOS_IDLE_TIME_BEFORE_SLEEP threshold in menuconfig.
+            注2：当此选项与 FREERTOS_USE_TICKLESS_IDLE 同时启用时，由于 UART 将
+            断电，UART FIFO 将在睡眠前刷新以避免数据丢失，但这有
+            可能阻塞睡眠过程并导致错过唤醒时间，这将导致从睡眠返回时
+            freertos 的滴答不能正确补偿，并可能导致系统崩溃。
+            为避免这种情况，您可以在 menuconfig 中增加 FREERTOS_IDLE_TIME_BEFORE_SLEEP 阈值。
 
     config PM_UPDATE_CCOMPARE_HLI_WORKAROUND
         bool
         default y if PM_ENABLE && BTDM_CTRL_HLI
 
     config PM_LIGHT_SLEEP_CALLBACKS
-        bool "Enable registration of pm light sleep callbacks"
+        bool "启用注册 pm 轻度睡眠回调"
         depends on FREERTOS_USE_TICKLESS_IDLE
         default n
         help
-            If enabled, it allows user to register entry and exit callbacks which are called before and after
-            entering auto light sleep.
+            如果启用，它允许用户注册进入和退出回调，这些回调在
+            进入自动轻度睡眠之前和之后调用。
 
-            NOTE: These callbacks are executed from the IDLE task context hence you cannot have any blocking calls
-            in your callbacks.
+            注意：这些回调是从 IDLE 任务上下文执行的，因此您不能在回调中
+            有任何阻塞调用。
 
-            NOTE: Enabling these callbacks may change sleep duration calculations based on time spent in callback and
-            hence it is highly recommended to keep them as short as possible
+            注意：启用这些回调可能会根据回调中花费的时间改变睡眠持续时间计算，
+            因此强烈建议尽可能保持它们简短。
 
 endmenu # "Power Management"

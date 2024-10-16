@@ -1,32 +1,32 @@
-menu "Memory"
+menu "内存"
 
     config ESP32S3_RTCDATA_IN_FAST_MEM
-        bool "Place RTC_DATA_ATTR and RTC_RODATA_ATTR variables into RTC fast memory segment"
+        bool "将 RTC_DATA_ATTR 和 RTC_RODATA_ATTR 变量放入 RTC 快速内存段"
         default n
         help
-            This option allows to place .rtc_data and .rtc_rodata sections into
-            RTC fast memory segment to free the slow memory region for ULP programs.
+            此选项允许将 .rtc_data 和 .rtc_rodata 段放入 RTC 快速内存段，
+            以释放慢速内存区域供 ULP 程序使用。
 
     config ESP32S3_USE_FIXED_STATIC_RAM_SIZE
-        bool "Use fixed static RAM size"
+        bool "使用固定的静态 RAM 大小"
         default n
         help
-            If this option is disabled, the DRAM part of the heap starts right after the .bss section,
-            within the dram0_0 region. As a result, adding or removing some static variables
-            will change the available heap size.
+            如果禁用此选项，堆的 DRAM 部分将在 .bss 段之后立即开始，
+            位于 dram0_0 区域内。因此，添加或删除一些静态变量
+            将改变可用的堆大小。
 
-            If this option is enabled, the DRAM part of the heap starts right after the dram0_0 region,
-            where its length is set with ESP32S3_FIXED_STATIC_RAM_SIZE
+            如果启用此选项，堆的 DRAM 部分将在 dram0_0 区域之后立即开始，
+            其长度由 ESP32S3_FIXED_STATIC_RAM_SIZE 设置。
 
     config ESP32S3_FIXED_STATIC_RAM_SIZE
-        hex "Fixed Static RAM size"
+        hex "固定静态 RAM 大小"
         default 0x10000
         range 0 0x54700 # Equal to I_D_SRAM_SIZE in linkerscript
         depends on ESP32S3_USE_FIXED_STATIC_RAM_SIZE
         help
-            RAM size dedicated for static variables (.data & .bss sections).
-            This value is less than the chips total memory, as not all of it can be used for this purpose.
-            E.g. parts are used by the software bootloader, and will only be available
-            as heap memory after app startup.
+            专用于静态变量（.data 和 .bss 段）的 RAM 大小。
+            此值小于芯片的总内存，因为并非所有内存都可用于此目的。
+            例如，部分内存被软件引导加载程序使用，只有在应用程序启动后
+            才能作为堆内存使用。
 
 endmenu # Memory

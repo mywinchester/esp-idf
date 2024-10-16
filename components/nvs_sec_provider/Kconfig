@@ -1,46 +1,43 @@
-menu "NVS Security Provider"
+menu "NVS 安全提供程序"
     visible if NVS_ENCRYPTION
 
     choice NVS_SEC_KEY_PROTECTION_SCHEME
-        prompt "NVS Encryption: Key Protection Scheme"
+        prompt "NVS 加密：密钥保护方案"
         depends on NVS_ENCRYPTION
         default NVS_SEC_KEY_PROTECT_USING_FLASH_ENC
         help
-            This choice defines the default NVS encryption keys protection scheme;
-            which will be used for the default NVS partition.
-            Users can use the corresponding scheme registration APIs to register other
-            schemes for the default as well as other NVS partitions.
+            此选项定义默认的 NVS 加密密钥保护方案；
+            该方案将用于默认的 NVS 分区。
+            用户可以使用相应的方案注册 API 来为默认分区以及其他 NVS 分区注册其他方案。
 
         config NVS_SEC_KEY_PROTECT_USING_FLASH_ENC
-            bool "Using Flash Encryption"
+            bool "使用闪存加密"
             depends on SECURE_FLASH_ENC_ENABLED
             help
-                Protect the NVS Encryption Keys using Flash Encryption
-                Requires a separate 'nvs_keys' partition (which will be encrypted by flash encryption)
-                for storing the NVS encryption keys
+                使用闪存加密保护 NVS 加密密钥
+                需要一个单独的 'nvs_keys' 分区（该分区将通过闪存加密进行加密）
+                用于存储 NVS 加密密钥
 
         config NVS_SEC_KEY_PROTECT_USING_HMAC
-            bool "Using HMAC peripheral"
+            bool "使用 HMAC 外设"
             depends on SOC_HMAC_SUPPORTED
             help
-                Derive and protect the NVS Encryption Keys using the HMAC peripheral
-                Requires the specified eFuse block (NVS_SEC_HMAC_EFUSE_KEY_ID or the v2 API argument)
-                to be empty or pre-written with a key with the purpose ESP_EFUSE_KEY_PURPOSE_HMAC_UP
+                使用 HMAC 外设派生和保护 NVS 加密密钥
+                需要指定的 eFuse 块（NVS_SEC_HMAC_EFUSE_KEY_ID 或 v2 API 参数）
+                为空或预先写入具有 ESP_EFUSE_KEY_PURPOSE_HMAC_UP 用途的密钥
 
     endchoice
 
     config NVS_SEC_HMAC_EFUSE_KEY_ID
-        int "eFuse key ID storing the HMAC key"
+        int "存储 HMAC 密钥的 eFuse 密钥 ID"
         depends on NVS_SEC_KEY_PROTECT_USING_HMAC
         range 0 6
         default 6
         help
-            eFuse block key ID storing the HMAC key for deriving the NVS encryption keys
+            存储用于派生 NVS 加密密钥的 HMAC 密钥的 eFuse 块密钥 ID
 
-            Note: The eFuse block key ID required by the HMAC scheme
-            (CONFIG_NVS_SEC_KEY_PROTECT_USING_HMAC) is set using this config when the default
-            NVS partition is initialized with nvs_flash_init(). The eFuse block key ID can
-            also be set at runtime by passing the appropriate value to the NVS security scheme
-            registration APIs.
+            注意：HMAC 方案（CONFIG_NVS_SEC_KEY_PROTECT_USING_HMAC）所需的 eFuse 块密钥 ID
+            在使用 nvs_flash_init() 初始化默认 NVS 分区时通过此配置设置。eFuse 块密钥 ID
+            也可以在运行时通过向 NVS 安全方案注册 API 传递适当的值来设置。
 
 endmenu

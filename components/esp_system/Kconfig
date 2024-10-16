@@ -1,5 +1,5 @@
 
-menu "ESP System Settings"
+menu "ESP 系统设置"
     # Insert chip-specific cpu config
     rsource "./port/soc/$IDF_TARGET/Kconfig.cpu"
 
@@ -10,55 +10,52 @@ menu "ESP System Settings"
     orsource "./port/soc/$IDF_TARGET/Kconfig.tracemem"
 
     choice ESP_SYSTEM_PANIC
-        prompt "Panic handler behaviour"
+        prompt "恐慌处理程序行为"
         default ESP_SYSTEM_PANIC_PRINT_REBOOT
         help
-            If FreeRTOS detects unexpected behaviour or an unhandled exception, the panic handler is
-            invoked. Configure the panic handler's action here.
+            如果 FreeRTOS 检测到意外行为或未处理的异常，将调用恐慌处理程序。
+            在此处配置恐慌处理程序的行为。
 
         config ESP_SYSTEM_PANIC_PRINT_HALT
-            bool "Print registers and halt"
+            bool "打印寄存器并停止"
             depends on !ESP_SYSTEM_GDBSTUB_RUNTIME
             help
-                Outputs the relevant registers over the serial port and halt the
-                processor. Needs a manual reset to restart.
+                通过串口输出相关寄存器并停止处理器。
+                需要手动重置才能重新启动。
 
         config ESP_SYSTEM_PANIC_PRINT_REBOOT
-            bool "Print registers and reboot"
+            bool "打印寄存器并重启"
             depends on !ESP_SYSTEM_GDBSTUB_RUNTIME
             help
-                Outputs the relevant registers over the serial port and immediately
-                reset the processor.
+                通过串口输出相关寄存器并立即重置处理器。
 
         config ESP_SYSTEM_PANIC_SILENT_REBOOT
-            bool "Silent reboot"
+            bool "静默重启"
             depends on !ESP_SYSTEM_GDBSTUB_RUNTIME
             help
-                Just resets the processor without outputting anything
+                不输出任何内容，只重置处理器
 
         config ESP_SYSTEM_PANIC_GDBSTUB
-            bool "GDBStub on panic"
+            bool "恐慌时启动 GDBStub"
             depends on ESP_GDBSTUB_ENABLED
             help
-                Invoke gdbstub on the serial port, allowing for gdb to attach to it to do a postmortem
-                of the crash.
+                在串口上调用 gdbstub，允许 gdb 附加以进行崩溃后的分析。
 
     endchoice
 
     config ESP_SYSTEM_PANIC_REBOOT_DELAY_SECONDS
-        int "Panic reboot delay (Seconds)"
+        int "恐慌重启延迟（秒）"
         default 0
         range 0 99
         depends on ESP_SYSTEM_PANIC_PRINT_REBOOT
         help
-            After the panic handler executes, you can specify a number of seconds to
-            wait before the device reboots.
+            恐慌处理程序执行后，您可以指定设备重启前等待的秒数。
 
     config ESP_SYSTEM_SINGLE_CORE_MODE
         bool
         default n
         help
-            Only initialize and use the main core.
+            仅初始化和使用主核心。
 
     config ESP_SYSTEM_RTC_EXT_XTAL
         # This is a High Layer Kconfig option, invisible, can be selected by other Kconfig option
@@ -73,22 +70,21 @@ menu "ESP System Settings"
         default n
 
     config ESP_SYSTEM_RTC_EXT_XTAL_BOOTSTRAP_CYCLES
-        int "Bootstrap cycles for external 32kHz crystal"
+        int "外部 32kHz 晶振的引导周期"
         depends on ESP_SYSTEM_RTC_EXT_XTAL
         default 5 if IDF_TARGET_ESP32
         default 0
         range 0 32768
         help
-            To reduce the startup time of an external RTC crystal,
-            we bootstrap it with a 32kHz square wave for a fixed number of cycles.
-            Setting 0 will disable bootstrapping (if disabled, the crystal may take
-            longer to start up or fail to oscillate under some conditions).
+            为了减少外部 RTC 晶振的启动时间，
+            我们用 32kHz 方波引导它固定的周期数。
+            设置为 0 将禁用引导（如果禁用，晶振可能需要更长时间启动或在某些条件下无法振荡）。
 
-            If this value is too high, a faulty crystal may initially start and then fail.
-            If this value is too low, an otherwise good crystal may not start.
+            如果该值过高，有缺陷的晶振可能最初启动然后失败。
+            如果该值过低，否则良好的晶振可能无法启动。
 
-            To accurately determine if the crystal has started,
-            set a larger "Number of cycles for RTC_SLOW_CLK calibration" (about 3000).
+            要准确确定晶振是否已启动，
+            请设置更大的"RTC_SLOW_CLK 校准周期数"（约 3000）。
 
     config ESP_SYSTEM_RTC_FAST_MEM_AS_HEAP_DEPCHECK
         bool
@@ -103,89 +99,84 @@ menu "ESP System Settings"
         depends on SOC_RTC_FAST_MEM_SUPPORTED
 
     config ESP_SYSTEM_ALLOW_RTC_FAST_MEM_AS_HEAP
-        bool "Enable RTC fast memory for dynamic allocations"
+        bool "允许将 RTC 快速内存用于动态分配"
         default y
         depends on ESP_SYSTEM_RTC_FAST_MEM_AS_HEAP_DEPCHECK
         help
-            This config option allows to add RTC fast memory region to system heap with capability
-            similar to that of DRAM region but without DMA. This memory will be consumed first per
-            heap initialization order by early startup services and scheduler related code. Speed
-            wise RTC fast memory operates on APB clock and hence does not have much performance impact.
+            此配置选项允许将 RTC 快速内存区域添加到系统堆中，其功能类似于 DRAM 区域，
+            但不支持 DMA。此内存将首先被早期启动服务和调度器相关代码根据堆初始化顺序消耗。
+            就速度而言，RTC 快速内存在 APB 时钟上运行，因此对性能影响不大。
 
     config ESP_SYSTEM_USE_EH_FRAME
-        bool "Generate and use eh_frame for backtracing"
+        bool "生成并使用 eh_frame 进行回溯"
         default n
         depends on IDF_TARGET_ARCH_RISCV
         help
-            Generate DWARF information for each function of the project. These information will parsed and used to
-            perform backtracing when panics occur. Activating this option will activate asynchronous frame unwinding
-            and generation of both .eh_frame and .eh_frame_hdr sections, resulting in a bigger binary size (20% to
-            100% larger). The main purpose of this option is to be able to have a backtrace parsed and printed by
-            the program itself, regardless of the serial monitor used.
-            This option shall NOT be used for production.
+            为项目的每个函数生成 DWARF 信息。这些信息将被解析并用于在发生恐慌时执行回溯。
+            激活此选项将激活异步帧展开和生成 .eh_frame 和 .eh_frame_hdr 部分，
+            导致二进制文件大小增加（20% 到 100% 更大）。此选项的主要目的是能够让程序自身
+            解析和打印回溯，而不管使用的串行监视器如何。
+            此选项不应用于生产。
 
-    menu "Memory protection"
+    menu "内存保护"
 
         config ESP_SYSTEM_PMP_IDRAM_SPLIT
-            bool "Enable IRAM/DRAM split protection"
+            bool "启用 IRAM/DRAM 分割保护"
             depends on SOC_CPU_IDRAM_SPLIT_USING_PMP
             default "y"
             help
-                If enabled, the CPU watches all the memory access and raises an exception in case
-                of any memory violation. This feature automatically splits
-                the SRAM memory, using PMP, into data and instruction segments and sets Read/Execute permissions
-                for the instruction part (below given splitting address) and Read/Write permissions
-                for the data part (above the splitting address). The memory protection is effective
-                on all access through the IRAM0 and DRAM0 buses.
+                如果启用，CPU 将监视所有内存访问并在发生任何内存违规时引发异常。
+                此功能自动使用 PMP 将 SRAM 内存分割为数据和指令段，
+                并为指令部分（在给定分割地址以下）设置读/执行权限，
+                为数据部分（在分割地址以上）设置读/写权限。
+                内存保护对通过 IRAM0 和 DRAM0 总线的所有访问都有效。
 
         config ESP_SYSTEM_MEMPROT_FEATURE
-            bool "Enable memory protection"
+            bool "启用内存保护"
             depends on SOC_MEMPROT_SUPPORTED
             default "y"
             help
-                If enabled, the permission control module watches all the memory access and fires the panic handler
-                if a permission violation is detected. This feature automatically splits
-                the SRAM memory into data and instruction segments and sets Read/Execute permissions
-                for the instruction part (below given splitting address) and Read/Write permissions
-                for the data part (above the splitting address). The memory protection is effective
-                on all access through the IRAM0 and DRAM0 buses.
+                如果启用，权限控制模块将监视所有内存访问，
+                如果检测到权限违规，将触发恐慌处理程序。此功能自动将 SRAM 内存
+                分割为数据和指令段，并为指令部分（在给定分割地址以下）设置读/执行权限，
+                为数据部分（在分割地址以上）设置读/写权限。
+                内存保护对通过 IRAM0 和 DRAM0 总线的所有访问都有效。
 
         config ESP_SYSTEM_MEMPROT_FEATURE_LOCK
             depends on ESP_SYSTEM_MEMPROT_FEATURE
-            bool "Lock memory protection settings"
+            bool "锁定内存保护设置"
             default "y"
             help
-                Once locked, memory protection settings cannot be changed anymore.
-                The lock is reset only on the chip startup.
+                一旦锁定，内存保护设置将无法再更改。
+                锁定仅在芯片启动时重置。
 
     endmenu  # Memory protection
 
     config ESP_SYSTEM_EVENT_QUEUE_SIZE
-        int "System event queue size"
+        int "系统事件队列大小"
         default 32
         help
-            Config system event queue size in different application.
+            在不同应用程序中配置系统事件队列大小。
 
     config ESP_SYSTEM_EVENT_TASK_STACK_SIZE
-        int "Event loop task stack size"
+        int "事件循环任务堆栈大小"
         default 2304
         help
-            Config system event task stack size in different application.
+            在不同应用程序中配置系统事件任务堆栈大小。
 
     config ESP_MAIN_TASK_STACK_SIZE
-        int "Main task stack size"
+        int "主任务堆栈大小"
         default 3584
         help
-            Configure the "main task" stack size. This is the stack of the task
-            which calls app_main(). If app_main() returns then this task is deleted
-            and its stack memory is freed.
+            配置"主任务"堆栈大小。这是调用 app_main() 的任务的堆栈。
+            如果 app_main() 返回，则此任务将被删除，其堆栈内存将被释放。
 
     choice ESP_MAIN_TASK_AFFINITY
-        prompt "Main task core affinity"
+        prompt "主任务核心亲和性"
         default ESP_MAIN_TASK_AFFINITY_CPU0
         help
-            Configure the "main task" core affinity. This is the used core of the task
-            which calls app_main(). If app_main() returns then this task is deleted.
+            配置"主任务"的核心亲和性。这是调用 app_main() 的任务使用的核心。
+            如果 app_main() 返回，则此任务将被删除。
 
         config ESP_MAIN_TASK_AFFINITY_CPU0
             bool "CPU0"
@@ -193,7 +184,7 @@ menu "ESP System Settings"
             bool "CPU1"
             depends on !FREERTOS_UNICORE
         config ESP_MAIN_TASK_AFFINITY_NO_AFFINITY
-            bool "No affinity"
+            bool "无亲和性"
 
     endchoice
 
@@ -204,66 +195,63 @@ menu "ESP System Settings"
         default FREERTOS_NO_AFFINITY if ESP_MAIN_TASK_AFFINITY_NO_AFFINITY
 
     config ESP_MINIMAL_SHARED_STACK_SIZE
-        int "Minimal allowed size for shared stack"
+        int "共享堆栈允许的最小大小"
         default 2048
         help
-            Minimal value of size, in bytes, accepted to execute a expression
-            with shared stack.
+            执行共享堆栈表达式所接受的最小大小值（以字节为单位）。
 
     choice ESP_CONSOLE_UART
-        prompt "Channel for console output"
+        prompt "控制台输出通道"
         default ESP_CONSOLE_UART_DEFAULT
         help
-            Select where to send console output (through stdout and stderr).
+            选择发送控制台输出的位置（通过 stdout 和 stderr）。
 
-            - Default is to use UART0 on pre-defined GPIOs.
-            - If "Custom" is selected, UART0 or UART1 can be chosen,
-              and any pins can be selected.
-            - If "None" is selected, there will be no console output on any UART, except
-              for initial output from ROM bootloader. This ROM output can be suppressed by
-              GPIO strapping or EFUSE, refer to chip datasheet for details.
-            - On chips with USB OTG peripheral, "USB CDC" option redirects output to the
-              CDC port. This option uses the CDC driver in the chip ROM.
-              This option is incompatible with TinyUSB stack.
-            - On chips with an USB serial/JTAG debug controller, selecting the option
-              for that redirects output to the CDC/ACM (serial port emulation) component
-              of that device.
+            - 默认使用预定义 GPIO 上的 UART0。
+            - 如果选择"自定义"，可以选择 UART0 或 UART1，
+              并可以选择任何引脚。
+            - 如果选择"无"，除了 ROM 引导加载程序的初始输出外，
+              不会在任何 UART 上有控制台输出。可以通过 GPIO 绑定或 EFUSE 抑制此 ROM 输出，
+              请参阅芯片数据表了解详细信息。
+            - 在具有 USB OTG 外设的芯片上，"USB CDC"选项将输出重定向到 CDC 端口。
+              此选项使用芯片 ROM 中的 CDC 驱动程序。
+              此选项与 TinyUSB 堆栈不兼容。
+            - 在具有 USB 串行/JTAG 调试控制器的芯片上，选择该设备的选项
+              将输出重定向到该设备的 CDC/ACM（串行端口模拟）组件。
+
         config ESP_CONSOLE_UART_DEFAULT
-            bool "Default: UART0"
+            bool "默认：UART0"
         config ESP_CONSOLE_USB_CDC
             bool "USB CDC"
             # && !TINY_USB is because the ROM CDC driver is currently incompatible with TinyUSB.
             depends on (IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3)  && !TINY_USB
         config ESP_CONSOLE_USB_SERIAL_JTAG
-            bool "USB Serial/JTAG Controller"
+            bool "USB 串行/JTAG 控制器"
             select ESPTOOLPY_NO_STUB if IDF_TARGET_ESP32C3  #ESPTOOL-252
             depends on SOC_USB_SERIAL_JTAG_SUPPORTED
         config ESP_CONSOLE_UART_CUSTOM
-            bool "Custom UART"
+            bool "自定义 UART"
         config ESP_CONSOLE_NONE
-            bool "None"
+            bool "无"
     endchoice
 
     choice ESP_CONSOLE_SECONDARY
         depends on SOC_USB_SERIAL_JTAG_SUPPORTED
-        prompt "Channel for console secondary output"
+        prompt "控制台次要输出通道"
         default ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG
         help
-            This secondary option supports output through other specific port like USB_SERIAL_JTAG
-            when UART0 port as a primary is selected but not connected. This secondary output currently only supports
-            non-blocking mode without using REPL. If you want to output in blocking mode with REPL or
-            input through this secondary port, please change the primary config to this port
-            in `Channel for console output` menu.
+            当选择 UART0 端口作为主要端口但未连接时，此次要选项支持通过其他特定端口（如 USB_SERIAL_JTAG）输出。
+            此次要输出目前仅支持非阻塞模式，不使用 REPL。如果您希望在阻塞模式下使用 REPL 或通过此次要端口输入，
+            请在"控制台输出通道"菜单中将主要配置更改为此端口。
         config ESP_CONSOLE_SECONDARY_NONE
-            bool "No secondary console"
+            bool "无次要控制台"
         config ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG
-            bool "USB_SERIAL_JTAG PORT"
+            bool "USB_SERIAL_JTAG 端口"
             depends on !ESP_CONSOLE_USB_SERIAL_JTAG
             help
-                This option supports output through USB_SERIAL_JTAG port when the UART0 port is not connected.
-                The output currently only supports non-blocking mode without using the console.
-                If you want to output in blocking mode with REPL or input through USB_SERIAL_JTAG port,
-                please change the primary config to ESP_CONSOLE_USB_SERIAL_JTAG above.
+                当 UART0 端口未连接时，此选项支持通过 USB_SERIAL_JTAG 端口输出。
+                输出目前仅支持非阻塞模式，不使用控制台。
+                如果您希望在阻塞模式下使用 REPL 或通过 USB_SERIAL_JTAG 端口输入，
+                请在上面将主要配置更改为 ESP_CONSOLE_USB_SERIAL_JTAG。
     endchoice
 
     config ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED
@@ -278,17 +266,16 @@ menu "ESP System Settings"
         default y if ESP_CONSOLE_UART_DEFAULT || ESP_CONSOLE_UART_CUSTOM
 
     choice ESP_CONSOLE_UART_NUM
-        prompt "UART peripheral to use for console output (0-1)"
+        prompt "用于控制台输出的 UART 外设（0-1）"
         depends on ESP_CONSOLE_UART_CUSTOM
         default ESP_CONSOLE_UART_CUSTOM_NUM_0
         help
-            This UART peripheral is used for console output from the ESP-IDF Bootloader and the app.
+            此 UART 外设用于 ESP-IDF 引导加载程序和应用程序的控制台输出。
 
-            If the configuration is different in the Bootloader binary compared to the app binary, UART
-            is reconfigured after the bootloader exits and the app starts.
+            如果引导加载程序二进制文件中的配置与应用程序二进制文件中的配置不同，
+            则在引导加载程序退出和应用程序启动后，UART 将被重新配置。
 
-            Due to an ESP32 ROM bug, UART2 is not supported for console output
-            via esp_rom_printf.
+            由于 ESP32 ROM 错误，UART2 不支持通过 esp_rom_printf 进行控制台输出。
 
         config ESP_CONSOLE_UART_CUSTOM_NUM_0
             bool "UART0"
@@ -315,7 +302,7 @@ menu "ESP System Settings"
         default -1 if ESP_CONSOLE_NONE
 
     config ESP_CONSOLE_UART_TX_GPIO
-        int "UART TX on GPIO#"
+        int "UART TX 使用的 GPIO#"
         depends on ESP_CONSOLE_UART_CUSTOM
         range 0 SOC_GPIO_OUT_RANGE_MAX
         default 1 if IDF_TARGET_ESP32
@@ -327,14 +314,14 @@ menu "ESP System Settings"
         default 24 if IDF_TARGET_ESP32H2
         default 43
         help
-             This GPIO is used for console UART TX output in the ESP-IDF Bootloader and the app (including
-             boot log output and default standard output and standard error of the app).
+             此 GPIO 用于 ESP-IDF 引导加载程序和应用程序的控制台 UART TX 输出
+             （包括引导日志输出以及应用程序的默认标准输出和标准错误）。
 
-             If the configuration is different in the Bootloader binary compared to the app binary, UART
-             is reconfigured after the bootloader exits and the app starts.
+             如果引导加载程序二进制文件中的配置与应用程序二进制文件中的配置不同，
+             则在引导加载程序退出和应用程序启动后，UART 将被重新配置。
 
     config ESP_CONSOLE_UART_RX_GPIO
-        int "UART RX on GPIO#"
+        int "UART RX 使用的 GPIO#"
         depends on ESP_CONSOLE_UART_CUSTOM
         range 0 SOC_GPIO_IN_RANGE_MAX
         default 3 if IDF_TARGET_ESP32
@@ -346,18 +333,18 @@ menu "ESP System Settings"
         default 23 if IDF_TARGET_ESP32H2
         default 44
         help
-            This GPIO is used for UART RX input in the ESP-IDF Bootloader and the app (including
-            default default standard input of the app).
+            此 GPIO 用于 ESP-IDF 引导加载程序和应用程序的 UART RX 输入
+            （包括应用程序的默认标准输入）。
 
-            Note: The default ESP-IDF Bootloader configures this pin but doesn't read anything from the UART.
+            注意：默认的 ESP-IDF 引导加载程序配置此引脚但不从 UART 读取任何内容。
 
-            If the configuration is different in the Bootloader binary compared to the app binary, UART
-            is reconfigured after the bootloader exits and the app starts.
+            如果引导加载程序二进制文件中的配置与应用程序二进制文件中的配置不同，
+            则在引导加载程序退出和应用程序启动后，UART 将被重新配置。
 
 
     config ESP_CONSOLE_UART_BAUDRATE
         int
-        prompt "UART console baud rate" if ESP_CONSOLE_UART_CUSTOM
+        prompt "UART 控制台波特率" if ESP_CONSOLE_UART_CUSTOM
         depends on ESP_CONSOLE_UART
         default 74880 if (IDF_TARGET_ESP32C2 && XTAL_FREQ_26)
         # TODO: IDF-8651 Check if need update
@@ -366,68 +353,62 @@ menu "ESP System Settings"
         range 1200 4000000 if !PM_ENABLE
         range 1200 1000000 if PM_ENABLE
         help
-            This baud rate is used by both the ESP-IDF Bootloader and the app (including
-            boot log output and default standard input/output/error of the app).
+            ESP-IDF 引导加载程序和应用程序都使用此波特率（包括引导日志输出和应用程序的默认标准输入/输出/错误）。
 
-            The app's maximum baud rate depends on the UART clock source. If Power Management is disabled,
-            the UART clock source is the APB clock and all baud rates in the available range will be sufficiently
-            accurate. If Power Management is enabled, REF_TICK clock source is used so the baud rate is divided
-            from 1MHz. Baud rates above 1Mbps are not possible and values between 500Kbps and 1Mbps may not be
-            accurate.
+            应用程序的最大波特率取决于 UART 时钟源。如果禁用电源管理，UART 时钟源是 APB 时钟，
+            可用范围内的所有波特率都将足够准确。如果启用电源管理，则使用 REF_TICK 时钟源，
+            因此波特率从 1MHz 分频。超过 1Mbps 的波特率是不可能的，
+            500Kbps 到 1Mbps 之间的值可能不准确。
 
-            If the configuration is different in the Bootloader binary compared to the app binary, UART
-            is reconfigured after the bootloader exits and the app starts.
+            如果引导加载程序二进制文件中的配置与应用程序二进制文件中的配置不同，
+            则在引导加载程序退出和应用程序启动后，UART 将被重新配置。
 
     config ESP_CONSOLE_USB_CDC_RX_BUF_SIZE
-        int "Size of USB CDC RX buffer"
+        int "USB CDC RX 缓冲区大小"
         depends on ESP_CONSOLE_USB_CDC
         default 64
         range 4 16384
         help
-            Set the size of USB CDC RX buffer. Increase the buffer size if your application
-            is often receiving data over USB CDC.
+            设置 USB CDC RX 缓冲区的大小。如果您的应用程序经常通过 USB CDC 接收数据，请增加缓冲区大小。
 
     config ESP_CONSOLE_USB_CDC_SUPPORT_ETS_PRINTF
-        bool "Enable esp_rom_printf / ESP_EARLY_LOG via USB CDC"
+        bool "通过 USB CDC 启用 esp_rom_printf / ESP_EARLY_LOG"
         depends on ESP_CONSOLE_USB_CDC
         default n
         help
-            If enabled, esp_rom_printf and ESP_EARLY_LOG output will also be sent over USB CDC.
-            Disabling this option saves about 1kB or RAM.
+            如果启用，esp_rom_printf 和 ESP_EARLY_LOG 输出也将通过 USB CDC 发送。
+            禁用此选项可节省约 1kB 的 RAM。
 
     config ESP_INT_WDT
-        bool "Interrupt watchdog"
+        bool "中断看门狗"
         default y
         help
-            This watchdog timer can detect if the FreeRTOS tick interrupt has not been called for a certain time,
-            either because a task turned off interrupts and did not turn them on for a long time, or because an
-            interrupt handler did not return. It will try to invoke the panic handler first and failing that
-            reset the SoC.
+            此看门狗定时器可以检测 FreeRTOS 滴答中断是否在一定时间内未被调用，
+            可能是因为任务关闭了中断并长时间未打开，或者中断处理程序未返回。
+            它将首先尝试调用恐慌处理程序，如果失败则重置 SoC。
 
     config ESP_INT_WDT_TIMEOUT_MS
-        int "Interrupt watchdog timeout (ms)"
+        int "中断看门狗超时（毫秒）"
         depends on ESP_INT_WDT
         default 300 if !(SPIRAM && IDF_TARGET_ESP32)
         default 800 if (SPIRAM && IDF_TARGET_ESP32)
         range 10 10000
         help
-            The timeout of the watchdog, in milliseconds. Make this higher than the FreeRTOS tick rate.
+            看门狗的超时时间，以毫秒为单位。使其高于 FreeRTOS 滴答率。
 
     config ESP_INT_WDT_CHECK_CPU1
-        bool "Also watch CPU1 tick interrupt"
+        bool "同时监视 CPU1 滴答中断"
         depends on ESP_INT_WDT && !FREERTOS_UNICORE
         default y
         help
-            Also detect if interrupts on CPU 1 are disabled for too long.
+            同时检测 CPU 1 上的中断是否被禁用太长时间。
 
     config ESP_TASK_WDT_EN
-        bool "Enable Task Watchdog Timer"
+        bool "启用任务看门狗定时器"
         default y
         help
-            The Task Watchdog Timer can be used to make sure individual tasks are still
-            running. Enabling this option will enable the Task Watchdog Timer. It can be
-            either initialized automatically at startup or initialized after startup
-            (see Task Watchdog Timer API Reference)
+            任务看门狗定时器可用于确保各个任务仍在运行。启用此选项将启用任务看门狗定时器。
+            它可以在启动时自动初始化或在启动后初始化（参见任务看门狗定时器 API 参考）
 
     config ESP_TASK_WDT_USE_ESP_TIMER
         # Software implementation of Task Watchdog, handy for targets with only a single
@@ -439,122 +420,113 @@ menu "ESP System Settings"
         select ESP_TIMER_SUPPORTS_ISR_DISPATCH_METHOD
 
     config ESP_TASK_WDT_INIT
-        bool "Initialize Task Watchdog Timer on startup"
+        bool "在启动时初始化任务看门狗定时器"
         depends on ESP_TASK_WDT_EN
         default y
         help
-            Enabling this option will cause the Task Watchdog Timer to be initialized
-            automatically at startup.
+            启用此选项将导致任务看门狗定时器在启动时自动初始化。
 
     config ESP_TASK_WDT_PANIC
-        bool "Invoke panic handler on Task Watchdog timeout"
+        bool "任务看门狗超时时调用恐慌处理程序"
         depends on ESP_TASK_WDT_INIT
         default n
         help
-            If this option is enabled, the Task Watchdog Timer will be configured to
-            trigger the panic handler when it times out. This can also be configured
-            at run time (see Task Watchdog Timer API Reference)
+            如果启用此选项，任务看门狗定时器将被配置为在超时时触发恐慌处理程序。
+            这也可以在运行时配置（参见任务看门狗定时器 API 参考）
 
     config ESP_TASK_WDT_TIMEOUT_S
-        int "Task Watchdog timeout period (seconds)"
+        int "任务看门狗超时期限（秒）"
         depends on ESP_TASK_WDT_INIT
         range 1 60
         default 5
         help
-            Timeout period configuration for the Task Watchdog Timer in seconds.
-            This is also configurable at run time (see Task Watchdog Timer API Reference)
+            任务看门狗定时器的超时期限配置，以秒为单位。
+            这也可以在运行时配置（参见任务看门狗定时器 API 参考）
 
     config ESP_TASK_WDT_CHECK_IDLE_TASK_CPU0
-        bool "Watch CPU0 Idle Task"
+        bool "监视 CPU0 空闲任务"
         depends on ESP_TASK_WDT_INIT
         default y
         help
-            If this option is enabled, the Task Watchdog Timer will watch the CPU0
-            Idle Task. Having the Task Watchdog watch the Idle Task allows for detection
-            of CPU starvation as the Idle Task not being called is usually a symptom of
-            CPU starvation. Starvation of the Idle Task is detrimental as FreeRTOS household
-            tasks depend on the Idle Task getting some runtime every now and then.
+            如果启用此选项，任务看门狗定时器将监视 CPU0 空闲任务。
+            让任务看门狗监视空闲任务可以检测 CPU 饥饿，因为空闲任务未被调用通常是 CPU 饥饿的症状。
+            空闲任务的饥饿是有害的，因为 FreeRTOS 家务任务依赖于空闲任务不时获得一些运行时间。
 
     config ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1
-        bool "Watch CPU1 Idle Task"
+        bool "监视 CPU1 空闲任务"
         depends on ESP_TASK_WDT_INIT && !FREERTOS_UNICORE
         default y
         help
-            If this option is enabled, the Task Watchdog Timer will wach the CPU1
-            Idle Task.
+            如果启用此选项，任务看门狗定时器将监视 CPU1 空闲任务。
 
     config ESP_XT_WDT
-        bool "Initialize XTAL32K watchdog timer on startup"
+        bool "在启动时初始化 XTAL32K 看门狗定时器"
         depends on SOC_XT_WDT_SUPPORTED && (ESP_SYSTEM_RTC_EXT_OSC || ESP_SYSTEM_RTC_EXT_XTAL)
         default n
         help
-            This watchdog timer can detect oscillation failure of the XTAL32K_CLK. When such a failure
-            is detected the hardware can be set up to automatically switch to BACKUP32K_CLK and generate
-            an interrupt.
+            此看门狗定时器可以检测 XTAL32K_CLK 的振荡失败。当检测到此类失败时，
+            硬件可以设置为自动切换到 BACKUP32K_CLK 并生成中断。
 
     config ESP_XT_WDT_TIMEOUT
-        int "XTAL32K watchdog timeout period"
+        int "XTAL32K 看门狗超时期限"
         depends on ESP_XT_WDT
         range 1 255
         default 200
         help
-            Timeout period configuration for the XTAL32K watchdog timer based on RTC_CLK.
+            基于 RTC_CLK 的 XTAL32K 看门狗定时器的超时期限配置。
 
     config ESP_XT_WDT_BACKUP_CLK_ENABLE
-        bool "Automatically switch to BACKUP32K_CLK when timer expires"
+        bool "定时器到期时自动切换到 BACKUP32K_CLK"
         depends on ESP_XT_WDT
         default y
         help
-            Enable this to automatically switch to BACKUP32K_CLK as the source of RTC_SLOW_CLK when
-            the watchdog timer expires.
+            启用此选项可在看门狗定时器到期时自动将 RTC_SLOW_CLK 的源切换到 BACKUP32K_CLK。
 
     config ESP_PANIC_HANDLER_IRAM
-        bool "Place panic handler code in IRAM"
+        bool "将恐慌处理程序代码放置在 IRAM 中"
         default n
         help
-            If this option is disabled (default), the panic handler code is placed in flash not IRAM.
-            This means that if ESP-IDF crashes while flash cache is disabled, the panic handler will
-            automatically re-enable flash cache before running GDB Stub or Core Dump. This adds some minor
-            risk, if the flash cache status is also corrupted during the crash.
+            如果禁用此选项（默认），恐慌处理程序代码将放置在闪存而不是 IRAM 中。
+            这意味着如果 ESP-IDF 在禁用闪存缓存时崩溃，恐慌处理程序将在运行 GDB Stub 或 Core Dump 之前
+            自动重新启用闪存缓存。这会增加一些小风险，如果在崩溃期间闪存缓存状态也被破坏。
 
-            If this option is enabled, the panic handler code (including required UART functions) is placed
-            in IRAM. This may be necessary to debug some complex issues with crashes while flash cache is
-            disabled (for example, when writing to SPI flash) or when flash cache is corrupted when an exception
-            is triggered.
+            如果启用此选项，恐慌处理程序代码（包括所需的 UART 函数）将放置在 IRAM 中。
+            这可能是调试某些复杂问题所必需的，例如在禁用闪存缓存时崩溃（例如，写入 SPI 闪存时）
+            或在触发异常时闪存缓存被破坏。
 
     config ESP_DEBUG_STUBS_ENABLE
-        bool "OpenOCD debug stubs"
+        bool "OpenOCD 调试存根"
         default COMPILER_OPTIMIZATION_LEVEL_DEBUG
         depends on !ESP32_TRAX && !ESP32S2_TRAX && !ESP32S3_TRAX
         help
-            Debug stubs are used by OpenOCD to execute pre-compiled onboard code
-            which does some useful debugging stuff, e.g. GCOV data dump.
+            调试存根由 OpenOCD 用于执行预编译的板载代码，
+            这些代码执行一些有用的调试功能，例如 GCOV 数据转储。
 
     config ESP_DEBUG_OCDAWARE
-        bool "Make exception and panic handlers JTAG/OCD aware"
+        bool "使异常和恐慌处理程序支持 JTAG/OCD"
         default y
         select FREERTOS_DEBUG_OCDAWARE
         help
-            The FreeRTOS panic and unhandled exception handers can detect a JTAG OCD debugger and
-            instead of panicking, have the debugger stop on the offending instruction.
+            FreeRTOS 的恐慌和未处理异常处理程序可以检测 JTAG OCD 调试器，
+            并且不会引发恐慌，而是让调试器在出错的指令处停止。
 
     choice ESP_SYSTEM_CHECK_INT_LEVEL
-        prompt "Interrupt level to use for Interrupt Watchdog and other system checks"
+        prompt "用于中断看门狗和其他系统检查的中断级别"
         default ESP_SYSTEM_CHECK_INT_LEVEL_4
         help
-            Interrupt level to use for Interrupt Watchdog, IPC_ISR and other system checks.
+            用于中断看门狗、IPC_ISR 和其他系统检查的中断级别。
 
         config ESP_SYSTEM_CHECK_INT_LEVEL_5
-            bool "Level 5 interrupt"
+            bool "5 级中断"
             depends on IDF_TARGET_ESP32
             help
-                Using level 5 interrupt for Interrupt Watchdog, IPC_ISR and other system checks.
+                为中断看门狗、IPC_ISR 和其他系统检查使用 5 级中断。
 
         config ESP_SYSTEM_CHECK_INT_LEVEL_4
-            bool "Level 4 interrupt"
+            bool "4 级中断"
             depends on !BTDM_CTRL_HLI
             help
-                Using level 4 interrupt for Interrupt Watchdog, IPC_ISR and other system checks.
+                为中断看门狗、IPC_ISR 和其他系统检查使用 4 级中断。
     endchoice
 
     # Insert chip-specific system config
@@ -564,72 +536,67 @@ menu "ESP System Settings"
         bool
         default n
         help
-            This config allows to trigger an interrupt when brownout detected. Software restart will be done
-            at the end of the default callback.
-            Two occasions need to restart the chip with interrupt so far.
-            (1). For ESP32 version 1, brown-out reset function doesn't work (see ESP32 errata 3.4).
-                  So that we must restart from interrupt.
-            (2). For special workflow, the chip needs do more things instead of restarting directly. This part
-                 needs to be done in callback function of interrupt.
+            此配置允许在检测到掉电时触发中断。默认回调结束时将执行软件重启。
+            目前有两种情况需要通过中断重启芯片。
+            (1). 对于 ESP32 版本 1，掉电重置功能不工作（参见 ESP32 勘误表 3.4）。
+                  因此我们必须从中断重启。
+            (2). 对于特殊工作流程，芯片需要执行更多操作而不是直接重启。这部分
+                 需要在中断的回调函数中完成。
 
     config ESP_SYSTEM_HW_STACK_GUARD
-        bool "Hardware stack guard"
+        bool "硬件堆栈保护"
         depends on SOC_ASSIST_DEBUG_SUPPORTED
         default y
         help
-            This config allows to trigger a panic interrupt when Stack Pointer register goes out of allocated stack
-            memory bounds.
+            此配置允许在堆栈指针寄存器超出分配的堆栈内存边界时触发恐慌中断。
 
     config ESP_SYSTEM_BBPLL_RECALIB
-        bool "Re-calibration BBPLL at startup"
+        bool "启动时重新校准 BBPLL"
         depends on IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32H2
         default y
         help
-            This configuration helps to address an BBPLL inaccurate issue when boot from certain bootloader version,
-            which may increase about the boot-up time by about 200 us. Disable this when your bootloader is built with
-            ESP-IDF version v5.2 and above.
+            此配置有助于解决从某些引导加载程序版本启动时 BBPLL 不准确的问题，
+            这可能会增加大约 200 微秒的启动时间。当您的引导加载程序使用 ESP-IDF v5.2 及以上版本构建时，可以禁用此选项。
 
     config ESP_SYSTEM_HW_PC_RECORD
-        bool "Hardware PC recording"
+        bool "硬件 PC 记录"
         depends on SOC_ASSIST_DEBUG_SUPPORTED
         default y
         help
-            This option will enable the PC recording function of assist_debug module. The PC value of the CPU will be
-            recorded to PC record register in assist_debug module in real time. When an exception occurs and the CPU
-            is reset, this register will be kept, then we can use the recorded PC to debug the causes of the reset.
+            此选项将启用 assist_debug 模块的 PC 记录功能。CPU 的 PC 值将
+            实时记录到 assist_debug 模块中的 PC 记录寄存器。当发生异常并且 CPU
+            被重置时，此寄存器将被保留，然后我们可以使用记录的 PC 来调试重置的原因。
 endmenu  # ESP System Settings
 
-menu "IPC (Inter-Processor Call)"
+menu "IPC（处理器间通信）"
 
     config ESP_IPC_TASK_STACK_SIZE
-        int "Inter-Processor Call (IPC) task stack size"
+        int "处理器间通信（IPC）任务堆栈大小"
         range 512 65536 if !APPTRACE_ENABLE
         range 2048 65536 if APPTRACE_ENABLE
         default 2048 if APPTRACE_ENABLE
         default 1280 if !APPTRACE_ENABLE && IDF_TARGET_ESP32S3
         default 1024
         help
-            Configure the IPC tasks stack size. An IPC task runs on each core (in dual core mode), and allows for
-            cross-core function calls. See IPC documentation for more details. The default IPC stack size should be
-            enough for most common simple use cases. However, users can increase/decrease the stack size to their
-            needs.
+            配置 IPC 任务的堆栈大小。在双核模式下，每个核心上运行一个 IPC 任务，
+            允许跨核函数调用。有关更多详细信息，请参阅 IPC 文档。默认的 IPC 堆栈大小
+            应该足够满足大多数常见的简单用例。但是，用户可以根据需要增加/减少堆栈大小。
 
     config ESP_IPC_USES_CALLERS_PRIORITY
-        bool "IPC runs at caller's priority"
+        bool "IPC 以调用者的优先级运行"
         default y
         depends on !FREERTOS_UNICORE
         help
-            If this option is not enabled then the IPC task will keep behavior same as prior to that of ESP-IDF v4.0,
-            hence IPC task will run at (configMAX_PRIORITIES - 1) priority.
+            如果不启用此选项，则 IPC 任务将保持与 ESP-IDF v4.0 之前相同的行为，
+            因此 IPC 任务将以 (configMAX_PRIORITIES - 1) 的优先级运行。
 
     config ESP_IPC_ISR_ENABLE
         bool
         default y if !ESP_SYSTEM_SINGLE_CORE_MODE
         help
-            The IPC ISR feature is similar to the IPC feature except that the callback function is executed in the
-            context of a High Priority Interrupt. The IPC ISR feature is intended for low latency execution of simple
-            callbacks written in assembly on another CPU. Due to being run in a High Priority Interrupt, the assembly
-            callbacks must be written with particular restrictions (see "IPC" and "High-Level Interrupt" docs for more
-            details).
+            IPC ISR 功能类似于 IPC 功能，但回调函数在高优先级中断的上下文中执行。
+            IPC ISR 功能旨在在另一个 CPU 上以低延迟执行用汇编编写的简单回调。
+            由于在高优先级中断中运行，汇编回调必须遵循特定的限制（有关更多详细信息，
+            请参阅"IPC"和"高级中断"文档）。
 
 endmenu # "IPC (Inter-Processor Call)
